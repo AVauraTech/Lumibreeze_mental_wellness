@@ -1,0 +1,397 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+:root {
+  --card-size: clamp(44px, 10.5vw, 96px);
+  --gap: clamp(6px, 1.1vw, 14px);
+  --pink: #ff69b4;
+  --pink-deep: #ff1493;
+}
+
+body {
+  font-family: 'Comic Neue', sans-serif;
+  background: url('images/bg.jpg') no-repeat center center fixed, #f7f7f7;
+  background-size: cover;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.home-link {
+  position: fixed;
+  top: 14px; left: 16px;
+  z-index: 200;
+  font-size: 1.5rem;
+  text-decoration: none;
+  background: #fff8dc;
+  border: 2px solid var(--pink);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 10px #ff69b455;
+}
+.home-link:hover { background: #ffe4ef; transform: scale(1.08); }
+
+.tagline {
+  margin: -6px 0 12px;
+  font-size: 1.05rem;
+  color: #d63384;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.fun-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 3.5rem;
+  color: #ff69b4;
+  text-shadow: 3px 3px 0 #fff, 5px 5px 0 #ff1493;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  animation: wiggle 1.2s ease-in-out infinite;
+}
+
+@keyframes wiggle { 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg);} }
+
+/* Control bar */
+.control-bar {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-bottom: 10px;
+}
+
+.difficulty {
+  font-size: 1.1rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #ff69b4;
+  color: #d63384;
+  background: #fff8dc;
+  font-family: 'Comic Neue', cursive;
+  outline: none;
+}
+
+.info {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #ff6f91;
+  background: #fff8dc;
+  padding: 10px 20px;
+  border: 3px dashed #ffb6c1;
+  display: inline-block;
+  border-radius: 15px;
+  box-shadow: 0 0 8px #ff69b4;
+  animation: bounceFade 2s ease-in-out infinite;
+}
+@keyframes bounceFade {0%{opacity:0.7} 45%{opacity:1} 100%{opacity:0.7}}
+
+.label {
+  font-weight: bold;
+  color: #ff1493;
+  text-shadow: 1px 1px #fff;
+}
+
+#restart, #play-again, #hint-btn, #pause-btn, #sound-toggle {
+  padding: 12px 22px;
+  font-size: 1.1rem;
+  font-family: 'Fredoka One', cursive;
+  background-color: #ffb6c1;
+  color: #fff;
+  border: none; border-radius: 25px; cursor: pointer;
+  box-shadow: 0 4px #d46a96;
+  margin: 6px 3px;
+  transition: transform 0.18s, background-color 0.28s;
+}
+#restart:hover, #play-again:hover, #hint-btn:hover,
+#pause-btn:hover, #sound-toggle:hover {
+  background-color: #ff69b4; transform: scale(1.06);
+}
+#restart:active, #play-again:active,
+#hint-btn:active, #pause-btn:active, #sound-toggle:active {
+  box-shadow: 0 2px #c94b84; transform: translateY(2px);
+}
+#hint-btn, #pause-btn, #sound-toggle { padding: 7px 12px; font-size: 1.4rem; }
+
+.game-board {
+  display: grid;
+  justify-content: center;
+  gap: var(--gap);
+  margin: 0 auto 15px;
+}
+
+.card {
+  width: var(--card-size); height: var(--card-size);
+  perspective: 600px;
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  outline: none;
+  background: none;
+  border: none;
+  position: relative;
+  user-select: none;
+  transition: box-shadow 0.2s, opacity 0.35s, transform 0.35s;
+}
+.card:focus { box-shadow: 0 0 0 3px #ffb6c1; }
+
+.card-inner {
+  width: 100%; height: 100%;
+  transition: transform 0.43s cubic-bezier(.36,2,.6,.8);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.card.flipped .card-inner { transform: rotateY(180deg); }
+
+.card-front, .card-back {
+  backface-visibility: hidden;
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 12px;
+  background-size: cover; background-position: center;
+  box-shadow: 0 2px 5px rgba(255,105,180,0.10) inset;
+}
+
+/* images/back.jpg is not in the repo, so the card back is drawn in CSS. */
+.card-front {
+  background:
+    radial-gradient(circle at 30% 28%, #fff3f8 0%, transparent 42%),
+    repeating-linear-gradient(45deg, #ffd1e6 0 10px, #ffc0dc 10px 20px);
+  border: 2px solid #ff9ecb;
+}
+.card-front::after {
+  content: '🐾';
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: calc(var(--card-size) * 0.42);
+  opacity: 0.55;
+}
+.card-back      { transform: rotateY(180deg); border: 2px solid #fff; }
+
+.card.flipped .card-front { filter: brightness(0.7);}
+.card.flipped { box-shadow: 0 8px 16px #ffb6c150; }
+
+.card.matched {
+  box-shadow: 0 0 0 3px #6fdc8c, 0 8px 18px #6fdc8c55;
+  opacity: 0.82;
+  cursor: default;
+}
+.card.matched .card-inner { transform: rotateY(180deg) scale(0.95); }
+
+/* ---- Adaptive HUD ---- */
+.tier-badge {
+  display: inline-block;
+  margin: 0 auto 10px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffe4ef, #fff8dc);
+  border: 2px solid #ffb6c1;
+  color: #d63384;
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: 0.4px;
+}
+
+.stress-meter {
+  max-width: 380px;
+  margin: 0 auto 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.stress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #ffe4ef;
+  border: 1px solid #ffc0dc;
+  overflow: hidden;
+}
+.stress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+.stress-fill.calm { background: linear-gradient(90deg, #6fdc8c, #3fbf6f); }
+.stress-fill.warm { background: linear-gradient(90deg, #ffd166, #f4a259); }
+.stress-fill.hot  { background: linear-gradient(90deg, #ff8fa3, #e63946); }
+#stress-label { font-size: 0.85rem; color: #b3457a; font-weight: 700; }
+
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translate(-50%, 20px);
+  background: #2d3436ee;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 300;
+  max-width: 88vw;
+}
+.notice.show { opacity: 1; transform: translate(-50%, 0); }
+
+.xp-reward { color: #009966; font-weight: 700; margin: 6px 0 0; }
+
+/* ---- Micro-mindfulness break ---- */
+.mindful {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 34, 61, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 400;
+}
+.mindful.show { opacity: 1; pointer-events: auto; }
+.mindful-inner {
+  text-align: center;
+  color: #eaf6ff;
+  max-width: 460px;
+  padding: 2rem;
+}
+.mindful-orb {
+  width: 120px; height: 120px;
+  margin: 0 auto 1.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #a8e6ff, #3db3e2 55%, #1a5f8a);
+  box-shadow: 0 0 40px #3db3e2aa;
+  animation: breathe 8s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(0.72); box-shadow: 0 0 20px #3db3e266; }
+  45%      { transform: scale(1.12); box-shadow: 0 0 60px #3db3e2dd; }
+  60%      { transform: scale(1.12); }
+}
+.mindful p { font-size: 1.3rem; line-height: 1.5; margin: 0 0 1rem; }
+.mindful-count { font-size: 1.6rem; font-weight: 700; color: #7fd4ff; }
+
+/* Popup Winner */
+.popup {
+  display: none;
+  position: fixed;
+  top: 30%; left: 50%;
+  transform: translate(-50%, -30%);
+  background: #fff0f5;
+  border: 4px dashed #ff69b4;
+  border-radius: 20px;
+  z-index: 102;
+  padding: 35px 50px;
+  box-shadow: 0 0 24px #ff69b4;
+  font-family: 'Comic Neue', cursive;
+  color: #ff1493;
+}
+.popup h2 {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 2.3rem;
+  margin-bottom: 8px;
+}
+.popup:focus { outline: 4px #ff69b4 dashed;}
+
+.highscore-line {
+  color: #009966;
+  font-size: 1rem;
+  margin-top: 7px;
+}
+
+.footer-credits {
+  margin-top: 38px;
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 1.2rem;
+  color: #ff69b4; text-shadow: 2px 2px #fff;
+  animation: sparkle 2s ease-in-out infinite;
+}
+@keyframes sparkle { 0%{filter: brightness(1);} 50%{filter: brightness(1.2);} 100%{filter: brightness(1);} }
+.footer-credits .name { color: #ff1493; text-shadow: 1px 1px #ffc0cb; }
+
+/* Dark Mode */
+body.dark { background-color: #111; color: #eee; }
+body.dark .fun-title { color: #ffaec9; text-shadow: 1px 1px #444,2px 2px #ff1493; }
+body.dark .info    { color: #fff; background: #462938; border-color: #ff69b4; box-shadow: 0 0 10px #111; }
+body.dark #restart,body.dark #play-again,body.dark #hint-btn,body.dark #pause-btn,body.dark #sound-toggle { background: #171717; color: #ffc0cb; }
+body.dark .game-board { background: rgba(0,0,0,0.03);}
+body.dark .popup  { background: #2a2a2a; color: #ffb6c1; border-color: #ff69b4; box-shadow: 0 0 24px #57284a;}
+
+body.dark .card-front {
+  background:
+    radial-gradient(circle at 30% 28%, #4a3a44 0%, transparent 42%),
+    repeating-linear-gradient(45deg, #2b2430 0 10px, #241e2a 10px 20px);
+  border-color: #7a4a63;
+}
+body.dark .card, body.dark .card.flipped { box-shadow: 0 3px 10px #ff69b433; }
+
+/* Switch for dark mode */
+.switch { position: relative; display: inline-block;
+  width: 44px;height: 24px; margin-left: 9px; }
+.switch input { opacity:0;width:0;height:0;}
+.slider { position:absolute;cursor:pointer;left:0;right:0;top:0;bottom:0;background:#ccc; transition: .4s; border-radius: 16px;}
+.slider:before { position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px; background:#fff;border-radius:50%;transition: .4s;}
+input:checked + .slider {background:#ff69b4;}
+input:checked + .slider:before {transform:translateX(20px); }
+
+.confetti {
+  position: fixed;
+  left: 50%; top: 38%; z-index: 1001; 
+  font-size: 2.7rem; 
+  pointer-events: none;
+  animation: confetti-pop 1.3s cubic-bezier(.36,1.6,.6,.8) both;
+  will-change: transform,opacity;
+}
+@keyframes confetti-pop {
+  0% { opacity: 0.1; transform: scale(0.3) translateY(0) rotate(0);}
+  40%{ opacity:1;   transform: scale(2.2) translateY(-38px) rotate(20deg);}
+  100%{ opacity:0;  transform: scale(0.8) translateY(110px) rotate(-20deg);}
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 700px) {
+  .fun-title { font-size: 2.2rem;}
+  .popup { padding:10px 2vw; }
+  .info { font-size: 0.99rem;}
+  .tagline { font-size: 0.92rem; }
+}
+
+#easterEgg {
+  width: 40px;   /* Set width & height to control image size */
+  height: 55px;
+  background: url('egg.jpg') no-repeat center center;
+  background-size: contain;
+  cursor: pointer;
+  user-select: none;
+  animation: floatEgg 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+}
+  #eggMessage {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  color: #ff69b4;
+  background: #fff;
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-family: 'Comic Neue', cursive;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 250;
+  will-change: opacity, transform;
+}
+
