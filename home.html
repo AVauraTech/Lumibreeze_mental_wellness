@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LumiBreeze – Empower Your Wellness Journey</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/8b2a73e8df.js" crossorigin="anonymous"></script>
+
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: 
+        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #e0e6f0;
+      display: flex;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Overlay for background dim */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 34, 56, 0.4);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 270px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(10, 27, 51, 0.85);
+      backdrop-filter: saturate(130%) blur(15px);
+      border-right: 2px solid #3db3e2;
+      box-shadow: 0 6px 24px rgba(0, 120, 200, 0.33);
+      padding: 2rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 12000;
+    }
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+    .sidebar h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      text-align: center;
+      color: #50a3e6;
+      letter-spacing: 5px;
+      user-select: none;
+      text-shadow:
+        0 0 8px #60bbee,
+        0 0 20px #3db3e2,
+        0 0 28px #1a77be;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .sidebar h1 i {
+      color: #61dafb;
+      font-size: 2.8rem;
+      filter: drop-shadow(0 0 6px #61dafb);
+    }
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      flex-grow: 1;
+      margin-top: 0.5rem;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 0.9rem 1.6rem;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1.06rem;
+      color: #94b2ce;
+      box-shadow: inset 0 0 0 0 transparent;
+      transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.22s ease;
+    }
+    nav a i {
+      font-size: 1.38rem;
+      min-width: 26px;
+      text-align: center;
+      color: #3db3e2;
+      filter: drop-shadow(0 0 2px #3db3e2);
+    }
+    nav a:hover,
+    nav a.active {
+      color: #3db3e2;
+      background-color: rgba(61, 179, 226, 0.15);
+      box-shadow: 0 0 16px #3db3e2aa;
+      transform: scale(1.08);
+      cursor: pointer;
+    }
+    .profile {
+      font-weight: 700;
+      padding: 1rem 0;
+      text-align: center;
+      background: #0a1b332e;
+      border-radius: 24px;
+      color: #3db3e2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 1.18rem;
+      cursor: default;
+      user-select: none;
+      text-shadow: 0 0 10px #3db3e2cc;
+    }
+    .profile i {
+      font-size: 1.85rem;
+      color: #3db3e2;
+    }
+
+    /* Overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 11500;
+      transition: opacity 0.35s ease;
+    }
+    .overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Top bar */
+    header {
+      position: fixed;
+      top: 0;
+      left: 270px;
+      right: 0;
+      height: 70px;
+      background: rgba(25, 100, 155, 0.85);
+      backdrop-filter: saturate(140%) blur(18px);
+      box-shadow: 0 3px 16px rgba(26, 107, 184, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 11300;
+      user-select: none;
+    }
+    .sidebar.collapsed ~ header {
+      left: 0;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .menu-btn {
+      font-size: 2.8rem;
+      color: #d0e6ff;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: none; /* hidden on desktop */
+      transition: color 0.3s ease;
+    }
+    .menu-btn:focus,
+    .menu-btn:hover {
+      color: #a8d0ff;
+      outline: none;
+    }
+    @media (max-width: 900px) {
+      .menu-btn {
+        display: block;
+      }
+      header {
+        left: 0;
+        padding: 0 1.5rem;
+      }
+    }
+    .header-greeting {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #c1dbffcc;
+      opacity: 0.9;
+      font-style: italic;
+    }
+
+    /* Main content */
+    main.main {
+      margin-left: 270px;
+      margin-top: 70px;
+      padding: 3rem 3.5rem 3rem 3.5rem;
+      flex-grow: 1;
+      min-height: calc(100vh - 70px);
+      overflow-y: auto;
+      user-select: none;
+      position: relative;
+      z-index: 110;
+      color: #cddaf0;
+      background: linear-gradient(180deg, rgba(10, 27, 51, 0.8) 0%, rgba(14, 34, 61, 0.65) 100%);
+      border-radius: 24px 0 0 24px;
+      box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.05);
+      transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar.collapsed ~ main.main {
+      margin-left: 0;
+      border-radius: 0;
+    }
+
+    .title-section {
+  display: flex;
+  flex-direction: column;         /* Stack vertically for center alignment */
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 1rem;
+  user-select: none;
+}
+
+.title-section .logo {
+  width: 110px;                   /* Larger logo */
+  height: 110px;
+  border-radius: 20%;             /* Perfect circle */
+  background: #eaf6ff;            /* Optional: subtle back for contrast */
+  box-shadow: 0 0 20px #61c8ff33; /* Softer, less intense glow */
+  filter: drop-shadow(0 0 9px #61c8ff77);
+  transition: transform 0.28s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-section .logo img {
+  width: 90px;                    /* Scaled image inside the circle */
+  height: 90px;
+  border-radius: 50%;
+}
+
+.title-section .logo:hover {
+  transform: scale(1.06);
+}
+
+.title-section h2 {
+  font-size: 2.7rem;              /* Smaller, less glowing */
+  font-weight: 800;
+  color: #3884be;                 /* Less neon, more professional */
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.14;
+  text-shadow:
+    0 2px 12px #6ab0d722,
+    0 0 5px #eaf6ff44;
+  user-select: none;
+  margin: 0;
+  text-align: center;             /* Center title text */
+}
+
+.subtitle {
+  margin-top: -4px;
+  font-size: 1.18rem;
+  font-weight: 500;
+  color: #78a5e0cc;
+  letter-spacing: 1.2px;
+  font-style: italic;
+  max-width: auto;
+  text-align: center;
+  user-select: text;
+  text-shadow: none;              /* Remove excessive glow */
+}
+
+    /* Notifications */
+    .notification {
+      background: rgba(40, 92, 155, 0.25);
+      border-left: 6px solid #3db3e2cc;
+      color: #d0e6ff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 1.5rem 1.8rem;
+      border-radius: 18px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 36px #3db3e2bb;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      user-select: none;
+    }
+    .notification i {
+      font-size: 1.6rem;
+      color: #3db3e2;
+    }
+
+    /* Cards Grid */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      margin-top: 1.5rem;
+    }
+    .card {
+      background: rgba(34, 89, 146, 0.18);
+      backdrop-filter: saturate(140%) blur(10px);
+      border-radius: 22px;
+      padding: 2.5rem 2.3rem;
+      text-align: center;
+      box-shadow: 0 0 30px #3db3e288;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      justify-content: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      position: relative;
+    }
+    .card:hover,
+    .card:focus-visible {
+      background: rgba(40, 120, 210, 0.35);
+      box-shadow: 0 0 45px #61b4fbaa;
+      transform: translateY(-13px) scale(1.06);
+      outline: none;
+    }
+    .card h3 {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #61b4f7;
+      margin: 0;
+      letter-spacing: 1.8px;
+      text-shadow: 0 0 14px #3db3e2bb;
+    }
+    .card p {
+      font-size: 1.12rem;
+      color: #b8d5f7dd;
+      margin: 0;
+      line-height: 1.45;
+      user-select: none;
+    }
+    .card img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      border-radius: 30%;
+      filter: drop-shadow(0 0 12px #3db3e2cc);
+      margin: 0 auto;
+      user-select: none;
+    }
+    .new-badge {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: #39a2ffcc;
+      color: #0e2945;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 6px 16px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px #39a2ffbb;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Floating Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3db3e2cc 30%, #184973cc 85%);
+      box-shadow: 0 5px 28px #3db3e2cc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #66b0ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 16000;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #3db3e2ff;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #50a3e2ff;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .lumipet {
+      bottom: 30px;
+      right: 30px;
+    }
+    .chatbot {
+      bottom: 30px;
+      left: 30px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(18px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    main.main {
+      animation: fadeInUp 1.2s ease forwards;
+    }
+
+    /* Popup Message */
+    .popup-message {
+      position: fixed;
+      top: 27%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #0c2240cc;
+      color: #3db3e2;
+      font-weight: 700;
+      font-size: 1.35rem;
+      padding: 1.8rem 3.2rem;
+      border-radius: 24px;
+      box-shadow: 0 0 32px #3db3e2cc;
+      text-align: center;
+      z-index: 21000;
+      user-select: none;
+      animation: popupFade 0.45s ease forwards;
+    }
+    @keyframes popupFade {
+      from {opacity: 0; transform: translate(-50%, -60%) scale(0.875);}
+      to {opacity: 1; transform: translate(-50%, -50%) scale(1);}
+    }
+
+  footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+     /* Quick Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      margin-bottom: 3rem;
+    }
+    .action-btn {
+      background: linear-gradient(90deg, #00b894dd 0%, #4834d4cc 100%);
+      border: none;
+      border-radius: 32px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.18rem;
+      padding: 1.15rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      box-shadow: 0 5px 26px #22a6b366;
+      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      flex-shrink: 0;
+      letter-spacing: 0.9px;
+      user-select: none;
+    }
+    .action-btn i {
+      font-size: 1.45rem;
+    }
+    .action-btn:hover,
+    .action-btn:focus-visible {
+      background: linear-gradient(90deg, #00b894ff 10%, #4834d4ee 100%);
+      box-shadow: 0 0 38px #18dcffcc;
+      color: #18dcff;
+      transform: translateY(-5px) scale(1.09);
+      outline: none;
+    }
+    .custom-footer {
+  background: linear-gradient(90deg, #4834d4cc 0%, #00b894cc 100%);
+  color: #e0e6f0;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1.2px;
+  text-align: center;
+  padding: 14px 0;
+  box-shadow: 0 -4px 24px #00b894cc;
+  user-select: none;
+  font-family: 'Poppins', sans-serif;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  cursor: default;
+}
+
+.custom-footer .highlight {
+  color: #ffd47e;
+  text-shadow: 0 0 6px #ffd47e99;
+  font-style: italic;
+}
+
+
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar collapsed" id="sidebar" tabindex="0" aria-label="Primary navigation menu">
+    <h1 tabindex="-1" aria-hidden="true">
+      <i class="fas fa-wind"></i> LumiBreeze
+    </h1>
+    <nav role="navigation" aria-label="Dashboard navigation">
+      <a href="#" class="active" tabindex="0"><i class="fas fa-home"></i> Home</a>
+      <a href="mood.html" tabindex="0"><i class="fas fa-smile"></i> Journal & Mood</a>
+      <a href="pet.html" tabindex="0"><i class="fas fa-paw"></i> LumiPet</a>
+      <a href="recovery.html" tabindex="0"><i class="fas fa-heartbeat"></i> Recovery & Streaks</a>
+      <a href="calm.html" tabindex="0"><i class="fas fa-spa"></i> Calming Activities</a>
+      <a href="chatbot.html" tabindex="0"><i class="fas fa-robot"></i> Empathetic AI Chatbot</a>
+      <a href="index.html" tabindex="0"><i class="fas fa-th-large"></i> Card Switch Game</a>
+      <a href="habit.html" tabindex="0"><i class="fas fa-tasks"></i> Healthy Habit Tracker</a>
+      <a href="helpline.html" tabindex="0"><i class="fas fa-phone-alt"></i> Emergency & Helpline</a>
+      <a href="modes.html" tabindex="0"><i class="fas fa-toggle-on"></i> Mode Switch</a>
+      <a href="sanctuary.html" tabindex="0"><i class="fas fa-cube"></i> 3D Sanctuary</a>
+      <a href="resource.html" tabindex="0"><i class="fas fa-book-open"></i> Learning Hub</a>
+      <a href="settings.html" tabindex="0"><i class="fas fa-cog"></i> Settings</a>
+    </nav>
+    <div class="profile" aria-label="Logged in profile greeting">
+      <i class="fas fa-user-circle" aria-hidden="true"></i> Hello, Explorer!
+    </div>
+  </aside>
+
+  <!-- Overlay for mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Topbar -->
+  <header>
+    <div class="header-left">
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle sidebar menu" title="Toggle Menu" aria-expanded="false" aria-controls="sidebar">☰</button>
+    </div>
+    <div class="header-greeting" aria-live="polite">Hi, Explorer! Ready for a mindful day?
+      
+    </div>
+  
+  </header>
+
+  <!-- Main content -->
+  <main class="main" tabindex="0" aria-label="Main dashboard content">
+    <!-- Title & Subtitle -->
+    <section class="title-section">
+      <img src="image/logo.jpg" alt="LumiBreeze logo" class="logo" />
+      <h2>LumiBreeze</h2>
+    </section>
+    <p class="subtitle" tabindex="0">Empowering your wellness journey with mindful habits & joyful connections.</p>
+
+    <!-- Notification Widget -->
+    <section class="notification" role="alert" tabindex="0">
+      <i class="fas fa-bell" aria-hidden="true"></i>
+      New: Complete your daily mood log for bonus LumiPet XP!
+    </section>
+
+        <!-- Quick Action Cards -->
+    <section class="actions" aria-label="Quick actions for key features">
+      <button class="action-btn" onclick="location.href='index.html'" aria-label="Play Jungle-Jumble Mini Game" title="Test reflexes and focus with an engaging interactive card game.">
+        <i class="fas fa-gamepad"></i> JUNGLE-JUMBLE<br>Mini Game<br>
+        <img src="https://cdn-icons-png.flaticon.com/256/11932/11932712.png" alt="Card game icon" aria-hidden="true" style="width: 28px; height: 28px; margin-left: 6px;"/>
+      </button>
+        <button class="action-btn" onclick="location.href='pet.html'" aria-label="Navigate to LumiPet virtual companion" title="Grow and customize your companion, unlock fun accessories.">
+        <i class="fas fa-gamepad"></i> LUMIPET<br>Virtual Companion
+        <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet icon" aria-hidden="true" style="width: 28px; height: 28px; margin-left: 6px;"/>
+      </button>
+        <button class="action-btn" onclick="location.href='chatbot.html'" aria-label="Navigate to Empathetic AI Chatbot" title="Chat with LumiBot, your caring companion for support and advice.">
+        <i class="fas fa-gamepad"></i> LUMIBOT<br>Helpful Chatbot
+        <img src="https://cdn-icons-png.flaticon.com/128/8943/8943377.png" alt="Chatbot icon" aria-hidden="true" style="width: 28px; height: 28px; margin-left: 6px;"/>
+      </button>
+        <button class="action-btn" onclick="location.href='test.html'" aria-label="Navigate to Stress test" title="This assessment is informational only. Only a licensed healthcare provider can provide a diagnosis.">
+        <i class="fas fa-gamepad"></i> LUMI-TEST<br>Stress/Depression Test
+        <img src="https://cdn-icons-png.flaticon.com/256/9436/9436392.png" alt="Stress Test icon" aria-hidden="true" style="width: 28px; height: 28px; margin-left: 6px;"/>
+      </button>
+    </section>
+
+
+    <!-- Feature Cards -->
+    <section class="cards" aria-label="Feature overview cards with quick navigation">
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Mood and Journal tracking" onclick="location.href='mood.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/11519/11519116.png" alt="Mood icon" />
+        <h3>Mood & Journal</h3>
+        <p>Track emotions, journal daily, and view visual trends.</p>
+        <div class="new-badge">NEW</div>
+      </article>
+
+<!--   <article class="card" tabindex="0" role="link" aria-label="Navigate to LumiPet virtual companion" onclick="location.href='pet.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet icon" />
+        <h3>LumiPet 🐾</h3>
+        <p>Grow and customize your companion, unlock fun accessories.</p>
+      </article> -->
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Recovery and Streak support" onclick="location.href='recovery.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/4891/4891248.png" alt="Recovery icon" />
+        <h3>Recovery & Streaks</h3>
+        <p>Track your streaks, fight urges, and celebrate milestones.</p>
+      </article>
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Calming Activities and Exercises" onclick="location.href='calm.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/4961/4961551.png" alt="Calming Activities icon" />
+        <h3>Calming Activities</h3>
+        <p>Engage in guided meditations, breathing, and mindful exercises.</p>
+      </article>
+
+ <!--      <article class="card" tabindex="0" role="link" aria-label="Navigate to Empathetic AI Chatbot" onclick="location.href='chatbot.html'">
+        <img src="https://cdn-icons-png.flaticon.com/128/8943/8943377.png" alt="Chatbot icon" />
+        <h3>Empathetic AI Chatbot</h3>
+        <p>Chat with LumiBot, your caring companion for support and advice.</p>
+      </article> 
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Card Switch Game" onclick="location.href='index.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/11932/11932712.png" alt="Card game icon" />
+        <h3>Card Switch Game</h3>
+        <p>Test reflexes and focus with an engaging interactive card game.</p>
+      </article> -->
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Healthy Habit Tracker" onclick="location.href='habit.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/10309/10309922.png" alt="Habit tracker icon" />
+        <h3>Healthy Habit Tracker</h3>
+        <p>Water, sleep, movement, gratitude — track your daily habits.</p>
+      </article>
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Emergency and Helpline Support" onclick="location.href='helpline.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/9821/9821807.png" alt="Emergency icon" />
+        <h3>Emergency & Helpline</h3>
+        <p>Quick access to support resources when you need help urgently.</p>
+      </article>
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Mode Switch for personalized experience" onclick="location.href='modes.html'">
+        <img src="https://cdn-icons-png.flaticon.com/128/466/466154.png" alt="Mode switch icon" />
+        <h3>Mode Switch</h3>
+        <p>Toggle between Student and Professional modes for tailored experience.</p>
+      </article>
+
+ <!--      <article class="card" tabindex="0" role="link" aria-label="Navigate to Stress test" onclick="location.href='test.html'">
+        <img src="https://cdn-icons-png.flaticon.com/256/9436/9436392.png" alt="test icon" />
+        <h3>Depression/Stress Test</h3>
+        <p>This assessment is informational only. Only a licensed healthcare provider can provide a diagnosis.</p>
+      </article> -->
+
+      <article class="card" tabindex="0" role="link" aria-label="Navigate to Resources and Learning Hub" onclick="location.href='resource.html'">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828919.png" alt="Resources icon" />
+        <h3>Learning Hub</h3>
+        <p>Blogs, guides, curated videos, and expert advice to empower you.</p>
+      </article>
+    </section>
+  </main>
+
+  <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" title="Click me for a motivational message">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" title="Click me for a supportive chatbot message">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    let sidebarExpanded = false;
+
+    function toggleSidebar() {
+      sidebarExpanded = !sidebarExpanded;
+      if (sidebarExpanded) {
+        sidebar.classList.remove('collapsed');
+        overlay.classList.add('active');
+        menuBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        sidebar.classList.add('collapsed');
+        overlay.classList.remove('active');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    menuBtn.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 900 && sidebarExpanded) {
+          toggleSidebar();
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if(event.key.toLowerCase() === 'm' && window.innerWidth > 900) {
+        sidebar.classList.toggle('collapsed');
+      }
+    });
+
+    function showConfettiPopup(message, duration = 4000) {
+      const popup = document.createElement('div');
+      popup.className = 'popup-message';
+      popup.textContent = message;
+      document.body.appendChild(popup);
+
+      confetti({
+        particleCount: 180,
+        spread: 90,
+        origin: { y: 0.9 }
+      });
+
+      setTimeout(() => {
+        popup.style.transition = 'opacity 0.5s ease';
+        popup.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(popup), 500);
+      }, duration);
+    }
+
+    const lumipet = document.getElementById('lumipet');
+    const petMessages = [
+      "🐾 LumiPet says: Keep shining, you're doing amazing! 🌟",
+      "🐾 Take a mindful breath – LumiPet is proud of you!",
+      "🐾 Stay curious, Explorer, you've made real progress!",
+      "🐾 High five from LumiPet – Every small step matters!",
+      "🐾 Remember, your wellbeing is a journey, keep it up!",
+      "🐾 LumiPet here to remind: You are not alone 💙",
+      "🐾 Feeling stressed? Try a calming activity next!",
+      "🐾 Celebrate your wins, no matter how small!"
+    ];
+    lumipet.addEventListener('click', () => {
+      const message = petMessages[Math.floor(Math.random() * petMessages.length)];
+      showConfettiPopup(message);
+    });
+
+    const chatbot = document.getElementById('chatbot');
+    const botMessages = [
+      "🤖 LumiBot here: How can I assist you today?",
+      "🤖 Remember, it's okay to ask for help anytime.",
+      "🤖 Keep going! I'm here with you every step.",
+      "🤖 Feeling stuck? Let's take a deep breath together.",
+      "🤖 You matter. Let's tackle this together!",
+      "🤖 LumiBot sending positive vibes your way! 💙"
+    ];
+    if (chatbot) {
+      chatbot.addEventListener('click', () => {
+        const message = botMessages[Math.floor(Math.random() * botMessages.length)];
+        showConfettiPopup(message);
+      });
+    }
+
+
+
+  </script>
+  <footer class="custom-footer" aria-label="Page footer">
+  Designed and Developed by <span class="highlight">Anushka Vidyarthy</span>
+</footer>
+
+</body>
+</html>
