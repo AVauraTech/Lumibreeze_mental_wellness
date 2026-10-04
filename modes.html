@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LumiBreeze Modes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(100deg, #eff4fc 0%, #ffffff 100%);
+      color: #23262b;
+      padding: 32px 10vw;
+      min-height: 100vh;
+      transition: background .6s;
+    }
+    .mode-container {
+      display: flex; flex-wrap: wrap; gap: 36px; margin-top: 40px; justify-content: space-around;
+    }
+    .mode-box {
+      background: #fff; border-radius: 22px; box-shadow: 0 6px 24px #2c65af1a;
+      width: 42%; min-width: 320px; padding: 32px 28px;
+      position: relative; overflow: hidden; transition: transform .25s, box-shadow .3s;
+    }
+    .mode-box:hover, .mode-box:focus-within {
+      transform: scale(1.035); box-shadow: 0 12px 44px #18577d23;
+    }
+    .mode-icon { font-size: 2.1em; margin-right: .3em; vertical-align: -5px; }
+    h1 { text-align: center; font-size: 2.7em; margin-bottom: .6em; font-weight: 900; }
+    .features-divider { width: 85%; height: 1.5px; background: #ededf3; margin: 24px auto 26px; border: 0; }
+    h2 { font-size: 2em; color: #2475b6; margin-top: 0; display:flex; align-items:center;}
+    ul { padding-left:18px; }
+    li { margin-bottom: 12px; font-size: 1.15em; }
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 90px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 150px;
+      right: 30px;
+    }
+    /* Timer & Progress */
+    .timer-area {
+      background: #f5fbfe; border-radius: 14px; padding: 18px 16px;
+      margin: 24px 0 8px;
+    }
+    label {font-weight:800;}
+    .timer-btn {
+      background: #2999af; color: #fff; border: none; border-radius: 8px;
+      padding: 9px 25px; font-size: 1.02em; font-weight: 800; cursor: pointer; margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    .progress-ring { width: 42px; height: 42px; vertical-align: -7px;}
+    .study-fact, .work-fact {
+      background: #f6fff7; border-left: 6px solid #96e37d; color: #12602a;
+      padding: .73em 1em; border-radius: 10px; margin: 18px 0;
+    }
+    .recap {
+      background: #fff6e2; border-left: 6px solid #edb95b; color: #83590a;
+      padding: .73em 1em; border-radius: 10px; margin: 18px 0 0;
+    }
+    /* Professional Mode Feature Cards */
+    .feature-card {
+      background: #f3f8fd; border-radius: 14px; margin-bottom: 22px; /* = consistent with divider */
+      box-shadow: 0 2px 14px #baddf21d;
+      padding: 22px 16px; /* extra internal space */
+      display: flex; flex-direction: column; align-items: flex-start;
+      gap: 10px;
+    }
+    .feature-card:last-child { margin-bottom: 0;}
+    .feature-title {
+      font-size: 1.12em; font-weight: 700; color: #205483; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .feature-desc {
+      font-size: 1em; color: #3b3e46; margin-bottom: 5px;
+    }
+    @media (max-width: 900px) {
+      body { padding: 26px 1vw; }
+      .mode-container { flex-direction: column; align-items: center; gap: 32px;}
+      .mode-box { min-width: 98vw; width: 98vw; padding: 22px 6vw; }
+    }
+    .quote { text-align:center; font-style:italic; color: #607188; margin-top: 38px; font-size: 1.14em;}
+      footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ Choose Your LumiBreeze Mode</h1>
+  <div class="mode-container">
+      <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+    <!-- Student Mode -->
+    <div class="mode-box" tabindex="0">
+      <h2><span class="mode-icon" aria-hidden="true">🎓</span> Student Mode</h2>
+      <ul>
+        <li>Adaptive study tips & motivation facts</li>
+        <li>Focus timer with progress ring and ambient music</li>
+        <li>Session recap with personalized feedback</li>
+      </ul>
+      <hr class="features-divider" aria-hidden="true"/>
+      <div class="timer-area" aria-label="Study Timer">
+        <label for="studyMinutes">Study Session (minutes):</label>
+        <input type="number" id="studyMinutes" value="25" min="1" max="180" style="width:60px; border-radius:5px; padding:3px 9px;">
+        <button class="timer-btn" onclick="startStudyTimer()">▶ Start Focus</button>
+        <span id="studyProgress"></span>
+        <div id="studyCountdown"></div>
+        <audio id="focusAudio" src="sound/forest.mp3" loop style="margin-top:1em;"></audio>
+      </div>
+      <div class="study-fact" id="studyFact"></div>
+      <div class="recap" id="studyRecap"></div>
+    </div>
+    <!-- Professional Mode -->
+    <div class="mode-box" tabindex="0">
+      <h2><span class="mode-icon" aria-hidden="true">💼</span> Professional Mode</h2>
+      <ul>
+        <li>Pomodoro work timer with progress ring and sound</li>
+        <li>Hourly desk yoga reminders with visual cue</li>
+        <li>Proactive burnout/self-care check-ins</li>
+      </ul>
+      <hr class="features-divider" aria-hidden="true"/>
+      <div class="timer-area" aria-label="Work Timer">
+        <button class="timer-btn" onclick="startPomodoro()">▶ Start Pomodoro (25m)</button>
+        <span id="workProgress"></span>
+        <div id="pomodoroCountdown"></div>
+        <audio id="pomoAudio" src="sound/rain.mp3" loop style="margin-top:1em;"></audio>
+      </div>
+      <div class="feature-card" style="margin-bottom: 24px;">
+        <span class="feature-title">🧘 Desk Yoga Reminder</span>
+        <span class="feature-desc">Receive hourly mindfulness/stretch breaks for healthy posture and reduced fatigue.</span>
+        <button class="timer-btn" onclick="startYogaReminder()">Start Desk Yoga</button>
+        <span id="yogaText"></span>
+      </div>
+      <div class="feature-card">
+        <span class="feature-title">💡 Burnout Check</span>
+        <span class="feature-desc">Proactive check-ins to help you avoid stress and maintain work-life balance.</span>
+        <button class="timer-btn" onclick="burnoutPrompt()">Self-check Now</button>
+        <span class="work-fact" id="burnoutResult"></span>
+      </div>
+      <div class="recap" id="workRecap"></div>
+    </div>
+  </div>
+  <p class="quote">“Balance is not something you find, it’s something you create.”</p>
+   <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+<script>
+// Timer and facts arrays
+let studyTimer, pomoTimer, yogaTimer, studyTimeLeft=0, pomoTimeLeft=0;
+const studyFacts = [
+  "Did you know? 50-minute study sprints with 10-minute breaks boost retention.",
+  "Micro-reviews (quick summaries) solidify learning long-term.",
+  "Try Feynman technique: explain a topic simply to master it deeper.",
+  "Ambient music can improve focus for most learners.",
+  "Breaks away from screens encourage creative insight."
+];
+const workFacts = [
+  "Move your eyes from the screen for 20 seconds every 20 minutes.",
+  "Try a power pose during breaks—it lifts mood and confidence.",
+  "Prolonged sitting risks fatigue: stand or stretch once an hour.",
+  "Set small, clear goals for each Pomodoro round.",
+  "Self-kindness increases overall job productivity."
+];
+// Progress ring SVG
+function makeRing(pct) {
+  let angle = Math.max(0, Math.min(1, pct)) * 283;
+  return `<svg class="progress-ring"><circle cx="21" cy="21" r="19" fill="none" stroke="#e4e5f2" stroke-width="4"/><circle cx="21" cy="21" r="19" fill="none" stroke="#47cdd6" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="${283-angle}"/></svg>`;
+}
+// Study Timer
+function startStudyTimer() {
+  let mins = Math.max(1, parseInt(document.getElementById('studyMinutes').value) || 25);
+  studyTimeLeft = mins * 60;
+  document.getElementById('focusAudio').play();
+  clearInterval(studyTimer);
+  showFact('study');
+  document.getElementById('studyRecap').textContent = "";
+  tickStudy();
+  studyTimer = setInterval(tickStudy, 1000);
+}
+function tickStudy() {
+  let m = Math.floor(studyTimeLeft/60), s = studyTimeLeft%60;
+  document.getElementById('studyCountdown').innerText = `${m}m ${s}s remaining`;
+  document.getElementById('studyProgress').innerHTML = makeRing(1-studyTimeLeft/(parseInt(document.getElementById('studyMinutes').value)*60));
+  if(studyTimeLeft--<=0) {
+    clearInterval(studyTimer);
+    document.getElementById('focusAudio').pause();
+    recap('study');
+  }
+}
+// Pomodoro (Pro Mode)
+function startPomodoro() {
+  pomoTimeLeft = 25*60;
+  clearInterval(pomoTimer);
+  document.getElementById('pomoAudio').play();
+  showFact('work');
+  document.getElementById('workRecap').textContent = "";
+  tickWork();
+  pomoTimer = setInterval(tickWork, 1000);
+}
+function tickWork() {
+  let m = Math.floor(pomoTimeLeft/60), s = pomoTimeLeft%60;
+  document.getElementById('pomodoroCountdown').innerText = `${m}m ${s}s remaining`;
+  document.getElementById('workProgress').innerHTML = makeRing(1-pomoTimeLeft/1500);
+  if(pomoTimeLeft--<=0) {
+    clearInterval(pomoTimer);
+    document.getElementById('pomoAudio').pause();
+    recap('work');
+  }
+}
+// Fact & Recap
+function showFact(type) {
+  const arr = type==='study'?studyFacts:workFacts;
+  const tgt = document.getElementById(type==='study'?'studyFact':'burnoutResult');
+  tgt.textContent = arr[Math.floor(Math.random()*arr.length)];
+}
+function recap(type) {
+  let str = type==='study'
+    ? "Study session complete! Reflect: What did you learn? Take 5 minutes to note summaries or insights."
+    : "Great job finishing your Pomodoro! Take a proper break—hydrate, move, and check in with yourself.";
+  document.getElementById(type==='study'?'studyRecap':'workRecap').textContent = str;
+}
+// Yoga Reminder (Pro Mode)
+function startYogaReminder() {
+  clearInterval(yogaTimer);
+  document.getElementById('yogaText').innerText = "Desk yoga reminder set. Next tip in 1h.";
+  yogaTimer = setInterval(()=>{
+    document.getElementById('yogaText').innerText = "⏳ Hour up! Take a short stretch: wrist rolls, neck circles, or seated twists.";
+  },3600000);
+}
+// Burnout Check
+function burnoutPrompt() {
+  showFact('work');
+}
+</script>
+</body>
+</html>
