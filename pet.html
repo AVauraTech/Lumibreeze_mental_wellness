@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LumiPet - Virtual Growth Companion</title>
+  <style>
+    /* ---------- Base ---------- */
+    :root{
+      --bg1: #e0d4f7;
+      --bg2: #fef9ff;
+      --accent-dark: #6e27d1;
+      --accent: #7b3ff5;
+      --muted: #6b4aa6;
+      --card: #ffffff;
+      --glass: rgba(255,255,255,0.65);
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(120,50,230,0.12);
+      --max-w: 1000px;
+      --glass-border: 1px solid rgba(151,116,236,0.15);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial; background: linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 100%); color: #2b0a3b; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    a{color:inherit}
+    main#app{max-width:var(--max-w);margin:28px auto;padding:18px;display:grid;grid-template-columns: 360px 1fr;gap:20px;align-items:start;}
+    header{grid-column:1/-1;text-align:center;margin-bottom:6px}
+    h1{font-size:28px;margin:0;font-weight:800;color:var(--accent-dark);text-shadow:0 0 10px rgba(201,183,255,0.6)}
+    p.lead{margin:6px 0 18px;color:#5b3a84;font-weight:600;text-align:center}
+
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 90px;
+      right: 30px;
+    }
+    .sanctuary {
+      top: 150px;
+      right: 30px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    /* ---------- Card ---------- */
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;border:var(--glass-border);overflow:hidden}
+    .flex{display:flex;gap:12px;align-items:center}
+    .col{display:flex;flex-direction:column;gap:10px}
+    .header-box {
+  background: #e1b9ed;              /* box background */
+  border: 2px solid #7b3ff5;     /* soft border */
+  border-radius: 12px;           /* rounded corners */
+  padding: 10px;                 /* spacing inside */
+  margin: 5px auto;             /* space outside, centered */            /* controls width */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* subtle shadow */
+  text-align: center;            /* center text */
+}
+
+
+    /* ---------- Left column (pet) ---------- */
+    #pet-panel{padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px}
+    #pet-img{width:180px;height:180px;border-radius:50%;object-fit:contain;box-shadow:0 6px 18px rgba(165,127,255,0.2);cursor:pointer;transition:transform .35s,filter .35s}
+    #pet-img.happy{animation:happyBounce 2.6s infinite}
+    #pet-img.sad{filter:grayscale(.6);animation:slowPulse 3.6s infinite}
+    @keyframes happyBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    @keyframes slowPulse{0%,100%{transform:scale(1)}50%{transform:scale(0.96)}}
+
+    #pet-name{font-weight:900;font-size:1.25rem;color:var(--accent-dark);min-height:28px}
+    .pet-meta{font-size:0.95rem;color:var(--muted);font-weight:700}
+
+    .stat-row{width:100%;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+    .stat-label{font-weight:800;font-size:0.95rem;color:var(--accent-dark)}
+    .stat-bar{width:100%;height:14px;background:#f0e7ff;border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 6px rgba(180,150,255,0.12)}
+    .stat-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ce71f7);transition:width .45s}
+
+    .pet-actions{display:flex;gap:8px;flex-wrap:wrap;width:100%;justify-content:center}
+    .btn{padding:9px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:800;background:var(--accent);color:white;box-shadow:0 6px 18px rgba(123,63,245,0.12)}
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid rgba(123,63,245,0.12)}
+    .mini{padding:6px 8px;font-size:0.9rem;border-radius:8px}
+
+    /* ---------- Right column ---------- */
+    .grid-right{display:grid;grid-template-rows:auto auto auto;gap:16px}
+    #top-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .progress-wrap{flex:1;min-width:220px}
+    .progress-outer{background:#fff;border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;box-shadow:var(--shadow)}
+    .progressbar{height:14px;background:#f3eefe;border-radius:999px;width:100%;overflow:hidden}
+    .progressbar > .fill{height:100%;width:0;background:linear-gradient(90deg,#7b3ff5,#d07af8);transition:width .4s}
+
+    select,input[type="text"],input[type="time"]{padding:9px 10px;border-radius:10px;border:1px solid rgba(167,137,233,0.5);outline:none;font-weight:700}
+    label{font-weight:800;color:var(--muted);font-size:0.95rem}
+
+    /* habit list */
+    #habit-goals{max-height:360px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+    .habit-item{display:flex;align-items:center;justify-content:space-between;background:#f6f2ff;padding:8px 10px;border-radius:10px;font-weight:700;color:var(--muted)}
+    .habit-item .left{display:flex;gap:8px;align-items:center}
+    .habit-item button{background:transparent;border:1px solid rgba(123,63,245,0.08);padding:6px 8px;border-radius:8px;font-weight:800;cursor:pointer}
+
+    /* accessories */
+    #accessory-list{display:flex;gap:8px;flex-wrap:wrap}
+    #accessory-list img{width:44px;height:44px;border-radius:8px;background:#fff;padding:6px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+
+    /* notification */
+    #notifications{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:linear-gradient(90deg,var(--accent),#d47bf6);color:white;padding:12px 18px;border-radius:12px;font-weight:900;display:none;z-index:9999}
+
+  main#app {
+  max-width: var(--max-w);
+  margin: 28px auto;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 20px;
+}
+
+#left-right-grids {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+}
+
+  footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    #large-pet-preview {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+#large-pet-img {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  object-fit: contain;
+  box-shadow: 0 10px 30px rgba(165,127,255,0.3);
+}
+
+#left-right-grids {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px #a678f7);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px #7b3ff5);
+  }
+}
+
+@keyframes gentleBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+#pet-img {
+  animation: pulse 4s ease-in-out infinite, gentleBounce 3s ease-in-out infinite;
+  transition: filter 0.3s ease;
+  cursor: pointer;
+}
+
+#pet-img:hover {
+  animation-play-state: paused;
+  filter: drop-shadow(0 0 25px #d07af8);
+  transform: scale(1.1);
+}
+
+
+    
+  </style>
+</head>
+<body>
+  <main id="app" role="application" aria-label="LumiPet 2.0 Virtual Companion" >
+    <header class="col" role="banner">
+  <div class="header-box">
+    <h1>🐾 LumiPet – Your Virtual Growth Companion</h1>
+    <p class="lead">Build healthy habits, earn XP, and watch Lumi evolve ✨</p>
+  </div>
+</header>
+
+<!-- Large pet image centered below header -->
+<section id="pet-preview" style="display: flex; justify-content: center; margin: 20px 0;">
+  <img id="pet-img" src="image/lumi1.jpg" alt="Large Lumi pet image" 
+       style="width: 320px; height: 320px; border-radius: 10%; object-fit: contain; box-shadow: 0 10px 30px rgba(165,127,255,0.3);"/>
+       <div id="pet-stage-label" 
+       style="position: absolute; top: 222px; left: 50%; transform: translateX(-50%); 
+              background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; border-radius: 12px;
+              font-weight: 900; font-size: 1rem; user-select: none; pointer-events: none;">
+    Baby
+  </div>
+</section>
+
+<!-- Existing left and right grids wrapped in a container -->
+<section id="left-right-grids" style="display: grid; grid-template-columns: 360px 1fr; gap: 20px;">
+
+      <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+
+  <button class="floating-btn sanctuary" id="sanctuary" aria-label="Open the 3D sanctuary" onclick="location.href='sanctuary.html'" title="3D Sanctuary">
+    🌐
+  </button>
+
+    <!-- LEFT: Pet panel -->
+    <section id="pet-panel" class="card" aria-label="Pet panel">
+
+</div>
+      <button id="preview-button" aria-label="Preview pet stages" type="button">Preview Pet Stages</button>
+
+      <div id="pet-name" contenteditable="true" role="textbox" aria-label="Pet name" spellcheck="false" placeholder="Click to name your pet">Click to name your pet</div>
+      <div class="pet-meta" id="pet-species">Species: Lumi</div>
+
+      <div class="stat-row" style="width:100%;max-width:320px">
+        <div class="stat-label">Hunger</div>
+        <div class="stat-bar"><div id="hunger-bar" class="stat-fill"></div></div>
+
+        <div class="stat-label">Thirst</div>
+        <div class="stat-bar"><div id="thirst-bar" class="stat-fill"></div></div>
+
+        <div class="stat-label">Happiness</div>
+        <div class="stat-bar"><div id="happiness-bar" class="stat-fill"></div></div>
+
+        <div class="stat-label">Energy</div>
+        <div class="stat-bar"><div id="energy-bar" class="stat-fill"></div></div>
+
+        <div class="stat-label">Cleanliness</div>
+        <div class="stat-bar"><div id="cleanliness-bar" class="stat-fill"></div></div>
+
+        <div class="stat-label">Health</div>
+        <div class="stat-bar"><div id="health-bar" class="stat-fill"></div></div>
+      </div>
+
+      <div id="pet-level" class="pet-meta">Level: Baby (XP: 0)</div>
+
+      <div class="pet-actions" role="group" aria-label="Pet actions">
+        <button class="btn" id="feed-btn" aria-label="Feed pet">Feed 🍖</button>
+        <button class="btn" id="give-water-btn" aria-label="Give water">Water 💧</button>
+        <button class="btn" id="play-btn" aria-label="Play with pet">Play 🎾</button>
+        <button class="btn secondary" id="sleep-btn" aria-label="Put pet to sleep">Sleep 🛌</button>
+        <button class="btn secondary" id="bath-btn" aria-label="Give pet a bath">Bath 🛁</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: Controls, progress, habits -->
+    <section class="grid-right">
+
+      <!-- Top Controls -->
+      <div id="top-controls" class="card">
+        <div class="progress-wrap">
+          <label for="mood-select">Your Mood</label>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+            <select id="mood-select" aria-describedby="mood-affirmation" title="Select your mood">
+              <option value="happy">😊 Happy</option>
+              <option value="neutral" selected>😐 Neutral</option>
+              <option value="sad">😔 Sad</option>
+            </select>
+
+            <div style="min-width:220px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <strong id="level-text">Level 1: Baby</strong>
+                <small id="xp-text">XP: 0</small>
+              </div>
+              <div class="progress-outer" aria-hidden="false" style="margin-top:8px">
+                <div class="progressbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div id="xp-fill" class="fill" style="width:0%"></div>
+                </div>
+              </div>
+              <div id="mood-affirmation" aria-live="polite" style="margin-top:8px;font-weight:800;color:var(--muted)">You're doing great — keep going!</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div style="font-weight:900;color:var(--accent-dark);">Gems: <span id="gems-count">0</span></div>
+          <button class="btn mini" id="buy-gems-btn">Buy Gems</button>
+
+          <button class="btn mini" id="habit-btn" aria-label="Complete a habit to earn XP">Complete Habit +10 XP</button>
+          <div id="streak-text" aria-live="polite" style="font-weight:800;color:var(--muted)">Streak: 0</div>
+        </div>
+      </div>
+
+      <!-- Habit & Goals -->
+      <div id="habit-goals" class="card" aria-label="Habits and goals">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0;font-size:1.1rem;color:var(--accent-dark)">Daily Habits</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="new-habit-input" type="text" placeholder="Add habit (e.g., 10-min walk)" aria-label="New habit" />
+            <button class="btn mini" id="add-habit-btn">Add</button>
+          </div>
+        </div>
+
+        <div id="habits-list" aria-live="polite" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(150,120,230,0.12);margin:12px 0">
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0;font-size:1.1rem;color:var(--accent-dark)">Accessories</h3>
+          <small style="color:var(--muted)">Unlocked</small>
+        </div>
+        <div id="accessory-list" style="margin-top:10px" role="list"></div>
+      </div>
+
+      <!-- Environment & Settings -->
+      <div class="card" aria-label="Environment and settings">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0;font-size:1.05rem;color:var(--accent-dark)">Pet Home</h3>
+          <div style="font-weight:800;color:var(--muted)">Coins: <span id="coins-count">0</span></div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <label for="decoration-select">Decoration</label>
+          <select id="decoration-select" aria-label="Choose decoration">
+            <option value="none">None</option>
+            <option value="Fairyland">Fairyland</option>
+            <option value="Forest">Forest</option>
+            <option value="Outerspace">Outerspace</option>
+            <option value="Underwater">Underwater</option>
+          </select>
+          <div style="flex:1"></div>
+          <button class="btn mini" id="buy-coins-btn" title="Buy coins (demo)">+50 Coins</button>
+        </div>
+
+        <div id="room-preview" style="margin-top:12px;border-radius:12px;padding:14px;background:linear-gradient(135deg,#e2cefb,#f9e9fe);height:120px;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent-dark)">Room Preview</div>
+      </div>
+    </section>
+
+    <!-- Notifications -->
+    <div id="notifications" role="status" aria-live="assertive"></div>
+  </main>
+   <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+
+  <script>
+/**********************
+ * LumiPet - JS
+ **********************/
+// Core state
+const DEFAULT_STATE = {
+  pet: {
+    species: 'lumi',
+    name: '',
+    color: '#a678f7',
+    currentStage: 0,
+    xp: 0,
+    hunger: 60,
+    thirst: 60,
+    happiness: 70,
+    energy: 70,
+    cleanliness: 80,
+    health: 90,
+    evolutionStages: ['Baby','Child','Teen','Adult','Evolved']
+  },
+  gems: 0,
+  coins: 100,
+  habits: [],
+  accessories: [
+    {src:'https://cdn-icons-png.flaticon.com/256/6240/6240471.png', alt:'Hat'},
+    {src:'https://cdn-icons-png.flaticon.com/256/10142/10142747.png', alt:'Scarf'},
+    {src:'https://cdn-icons-png.flaticon.com/256/8089/8089203.png', alt:'Glasses'}
+  ],
+  unlockedAccessoryIds: [0], // start with just one accessory for Baby Lumi
+  streak: 0,
+  lastHabitDate: null,
+  decoration: 'none',
+  soundEnabled: true
+};
+
+//let state = loadState() || DEFAULT_STATE;
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE)); // clone default state to avoid mutation
+
+// ---- Shared-store bridge -------------------------------------------------
+// js/core/store.js is the source of truth across every page (and the 3D
+// sanctuary). This page keeps a local working copy and mirrors it both ways.
+let STORE = null;
+import('./js/core/store.js').then(async (m) => {
+  await m.ready;
+  STORE = m;
+  hydrateFromStore();
+  updateUI();
+  m.subscribe(() => { hydrateFromStore(); updateUI(); });
+}).catch(() => { /* store unavailable: page still works for this session */ });
+
+function hydrateFromStore() {
+  const s = STORE.getState();
+  const p = s.pet;
+  Object.assign(state.pet, {
+    name: p.name,
+    species: p.species,
+    color: p.color || state.pet.color,
+    currentStage: p.stage,
+    xp: p.xp,
+    hunger: p.hunger,
+    thirst: p.thirst,
+    happiness: p.happiness,
+    energy: p.energy,
+    cleanliness: p.cleanliness,
+    health: p.health,
+  });
+  state.coins = s.economy.coins;
+  state.gems = s.economy.gems;
+  state.habits = (s.habits || []).map(h => ({ title: h.title }));
+  const ids = (s.unlockedAccessories || [])
+    .map(id => STORE.ACCESSORIES.findIndex(a => a.id === id))
+    .filter(i => i >= 0 && i < state.accessories.length);
+  state.unlockedAccessoryIds = ids.length ? ids : [0];
+  state.streak = s.streak.count;
+  state.lastHabitDate = s.streak.lastDate;
+  state.soundEnabled = s.settings.sound;
+}
+
+function pushToStore() {
+  if (!STORE) return;
+  STORE.setState(s => {
+    s.pet.name = state.pet.name;
+    s.pet.species = state.pet.species;
+    s.pet.color = state.pet.color;
+    s.pet.stage = state.pet.currentStage;
+    s.pet.xp = state.pet.xp;
+    s.pet.hunger = state.pet.hunger;
+    s.pet.thirst = state.pet.thirst;
+    s.pet.happiness = state.pet.happiness;
+    s.pet.energy = state.pet.energy;
+    s.pet.cleanliness = state.pet.cleanliness;
+    s.pet.health = state.pet.health;
+    s.economy.coins = state.coins;
+    s.economy.gems = state.gems;
+    s.habits = state.habits.map((h, i) => ({ id: h.id ?? 'habit-' + i, title: h.title }));
+    s.unlockedAccessories = state.unlockedAccessoryIds
+      .map(i => STORE.ACCESSORIES[i]?.id).filter(Boolean);
+    s.streak.count = state.streak;
+    s.streak.lastDate = state.lastHabitDate;
+    s.settings.sound = state.soundEnabled;
+  }, 'pet2d');
+}
+
+
+// DOM refs
+const petImg = document.getElementById('pet-img');
+const petNameEl = document.getElementById('pet-name');
+const petSpeciesEl = document.getElementById('pet-species');
+const petLevelEl = document.getElementById('pet-level');
+const hungerBar = document.getElementById('hunger-bar');
+const thirstBar = document.getElementById('thirst-bar');
+const happinessBar = document.getElementById('happiness-bar');
+const energyBar = document.getElementById('energy-bar');
+const cleanlinessBar = document.getElementById('cleanliness-bar');
+const healthBar = document.getElementById('health-bar');
+const moodSelect = document.getElementById('mood-select');
+const moodAffirmation = document.getElementById('mood-affirmation');
+const xpFill = document.getElementById('xp-fill');
+const xpText = document.getElementById('xp-text');
+const levelText = document.getElementById('level-text');
+const gemsCount = document.getElementById('gems-count');
+const coinsCount = document.getElementById('coins-count');
+const habitsList = document.getElementById('habits-list');
+const newHabitInput = document.getElementById('new-habit-input');
+const addHabitBtn = document.getElementById('add-habit-btn');
+const accessoryList = document.getElementById('accessory-list');
+const decorationSelect = document.getElementById('decoration-select');
+const roomPreview = document.getElementById('room-preview');
+const notifications = document.getElementById('notifications');
+const streakText = document.getElementById('streak-text');
+
+// Affirmations
+const AFF = {
+  happy: "Keep shining — you're amazing! 🌟",
+  neutral: "Every step is progress. 💪",
+  sad: "It's okay to feel — Lumi believes in you. 💜"
+};
+
+// utility
+const clamp = (v,min=0,max=100) => Math.min(max,Math.max(min,v));
+
+function notify(msg, duration=3000) {
+  notifications.textContent = msg;
+  notifications.style.display = 'block';
+  setTimeout(()=>{ notifications.style.display = 'none'; }, duration);
+}
+
+// Save / Load — persistence lives in the shared store now.
+function saveState(){
+  pushToStore();
+}
+
+// UI Updates
+function updatePetStatsUI(){
+  hungerBar.style.width = state.pet.hunger + '%';
+  thirstBar.style.width = state.pet.thirst + '%';
+  happinessBar.style.width = state.pet.happiness + '%';
+  energyBar.style.width = state.pet.energy + '%';
+  cleanlinessBar.style.width = state.pet.cleanliness + '%';
+  healthBar.style.width = state.pet.health + '%';
+}
+
+function updateTexts(){
+  petNameEl.textContent = state.pet.name || 'Click to name your pet';
+  petSpeciesEl.textContent = 'Species: ' + (state.pet.species.charAt(0).toUpperCase() + state.pet.species.slice(1));
+  petLevelEl.textContent = `Level: ${state.pet.evolutionStages[state.pet.currentStage]} (Gems: ${state.gems}, Coins: ${state.coins})`;
+  xpText.textContent = `XP: ${state.pet.xp}`;
+  levelText.textContent = `Stage: ${state.pet.evolutionStages[state.pet.currentStage]}`;
+  gemsCount.textContent = state.gems;
+  coinsCount.textContent = state.coins;
+  streakText.textContent = `Streak: ${state.streak} ${state.streak===1 ? 'day':'days'}`;
+  xpFill.style.width = (state.pet.xp % 100) + '%';
+}
+
+function renderHabits(){
+  habitsList.innerHTML = '';
+  if(state.habits.length === 0){
+    const empty = document.createElement('div');
+    empty.textContent = 'No habits yet — add one to start small!';
+    empty.style.opacity = .8;
+    empty.style.fontWeight = 700;
+    habitsList.appendChild(empty);
+    return;
+  }
+  state.habits.forEach((h, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'habit-item';
+    const left = document.createElement('div');
+    left.className='left';
+    left.textContent = h.title;
+    const right = document.createElement('div');
+
+    const doneBtn = document.createElement('button');
+    doneBtn.textContent = 'Done';
+    doneBtn.addEventListener('click', () => completeHabit(idx));
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.style.marginLeft = '8px';
+    delBtn.addEventListener('click', () => { 
+      state.habits.splice(idx,1);
+      saveState(); 
+      renderHabits(); 
+    });
+
+    right.appendChild(doneBtn);
+    right.appendChild(delBtn);
+    wrap.appendChild(left);
+    wrap.appendChild(right);
+    habitsList.appendChild(wrap);
+  });
+}
+
+function renderAccessories(){
+  accessoryList.innerHTML = '';
+  state.unlockedAccessoryIds.forEach(i => {
+    const acc = state.accessories[i];
+    if(!acc) return;
+    const img = document.createElement('img');
+    img.src = acc.src;
+    img.alt = acc.alt;
+    img.role = "listitem";
+    accessoryList.appendChild(img);
+  });
+}
+
+function updateRoomPreviewAndBackground(){
+  const dec = state.decoration;
+  let bg = 'linear-gradient(135deg,#e2cefb,#f9e9fe)';
+  let text = 'Room Preview';
+  switch(dec){
+    case 'Fairyland': 
+      bg = "url('image/fairyland.jpg')";
+      text = '';
+      break;
+    case 'Forest': 
+      bg = "url('image/forest.jpg')";
+      text = '';
+      break;
+    case 'Outerspace': 
+      bg = "url('image/outerspace.jpg')";
+      text = '';
+      break;
+    case 'Underwater': 
+      bg = "url('image/underwater.jpg')";
+      text = '';
+      break;
+    default: break;
+  }
+  // Update room preview panel
+  roomPreview.style.background = bg;
+  roomPreview.textContent = text;
+  
+  // Update entire screen (body) background as well with same style + fallback color
+  document.body.style.background = bg.includes('url') ? `${bg} no-repeat center center / cover` : bg;
+}
+
+// Evolution and Stage Upgrade by Gems and Coins
+function checkEvolutionByGemsAndCoins(){
+  let newStage = state.pet.currentStage;
+  // Stage progression conditions:
+  // 0->1 Baby → Child: gems>=100 & coins>=1000
+  // 1->2 Child → Teen: gems>=200 & coins>=2000
+  // 2->3 Teen → Adult: gems>=300 & coins>=3000
+  // 3->4 Adult → Evolved: gems>=400 & coins>=4000
+  if(state.gems >= 400 && state.coins >= 4000){
+    newStage = 4;
+  } else if(state.gems >= 300 && state.coins >= 3000){
+    newStage = 3;
+  } else if(state.gems >= 200 && state.coins >= 2000){
+    newStage = 2;
+  } else if(state.gems >= 100 && state.coins >= 1000){
+    newStage = 1;
+  } else {
+    newStage = 0;
+  }
+
+  if(newStage > state.pet.currentStage){
+    // Upgrade stage
+    state.pet.currentStage = newStage;
+    notify(`✨ Lumi evolved to ${state.pet.evolutionStages[newStage]}!`);
+    unlockAccessoryForStage(newStage);
+  }
+  
+  // Set pet image base on new stage
+  let imgSrc = 'image/lumi1.jpg';
+  switch(newStage){
+    case 1: imgSrc = 'image/lumi2.jpg'; break; // Child
+    case 2: imgSrc = 'image/lumi3.jpg'; break; // Teen
+    case 3: imgSrc = 'image/lumi4.jpg'; break; // Adult
+    case 4: imgSrc = 'image/lumi5.jpg'; break; // Evolved
+    default: imgSrc = 'image/lumi1.jpg'; // Baby
+  }
+  petImg.src = imgSrc;
+}
+
+// Unlock exactly one accessory per stage upgrade if not already unlocked
+function unlockAccessoryForStage(stage){
+  // We start with one unlocked (index 0) for Baby
+  // Unlock next accessory for Child (stage=1), Teen (2), Adult (3), Evolved (4)
+  // Safely unlock accessory if exists and not unlocked yet
+  if(stage <= 0) return;
+  const accessoryToUnlock = stage; // assumes accessories array has at least 5 (0..4) elements or handle bounds
+  if(!state.unlockedAccessoryIds.includes(accessoryToUnlock) && accessoryToUnlock < state.accessories.length){
+    state.unlockedAccessoryIds.push(accessoryToUnlock);
+    notify(`Unlocked accessory: ${state.accessories[accessoryToUnlock].alt} ✨`);
+    saveState();
+    renderAccessories();
+  }
+}
+
+// ACTIONS
+function feedPet(){
+  if(state.coins < 5){ notify('Not enough coins to feed.'); return; }
+  state.pet.hunger = clamp(state.pet.hunger + 25);
+  state.coins -= 5;
+  gainXP(10);
+  notify('You fed Lumi! +10 XP, -5 coins');
+  saveState(); updateUI();
+}
+function giveWater(){
+  if(state.coins < 3){ notify('Not enough coins for water.'); return; }
+  state.pet.thirst = clamp(state.pet.thirst + 30);
+  state.coins -= 3;
+  gainXP(8);
+  notify('You gave Lumi water! +8 XP, -3 coins');
+  saveState(); updateUI();
+}
+function sleepPet(){
+  state.pet.energy = clamp(state.pet.energy + 40);
+  state.pet.happiness = clamp(state.pet.happiness + 12);
+  gainXP(15);
+  notify('Lumi rested well! +15 XP');
+  saveState(); updateUI();
+}
+function bathPet(){
+  if(state.coins < 7){ notify('Not enough coins for a bath.'); return; }
+  state.pet.cleanliness = 100;
+  state.coins -= 7;
+  gainXP(12);
+  notify('Sparkly clean! +12 XP, -7 coins');
+  saveState(); updateUI();
+}
+function playPet(){
+  state.pet.happiness = clamp(state.pet.happiness + 20);
+  state.pet.energy = clamp(state.pet.energy - 15);
+  gainXP(18);
+  notify('Playtime! +18 XP');
+  saveState(); updateUI();
+}
+
+function gainXP(amount){
+  state.pet.xp += amount;
+  // reward gems at every full 100 XP
+  while(state.pet.xp >= 100){
+    state.pet.xp -= 100;
+    state.gems += 1;
+    notify('Level Up! You earned a gem ✨');
+    // unlock accessory every 3 gems (demo) - can keep or remove since now we unlock by stage
+    if(state.gems % 3 === 0) unlockRandomAccessory();
+  }
+  checkEvolutionByGemsAndCoins();
+  saveState();
+}
+
+// Habit completion
+function completeHabit(idx){
+  const today = new Date().toDateString();
+  if(state.lastHabitDate === today){
+    notify('You already completed a habit today — nice work!');
+    return;
+  }
+  const last = state.lastHabitDate ? new Date(state.lastHabitDate) : null;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  if(last && last.toDateString() === yesterday.toDateString()){
+    state.streak += 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastHabitDate = today;
+  gainXP(10);
+  notify('Habit done! +10 XP');
+  saveState();
+  updateUI();
+}
+
+// Unlock random accessory (existing demo feature)
+function unlockRandomAccessory(){
+  const newAccessories = [
+    {src:'https://cdn-icons-png.flaticon.com/256/10096/10096798.png', alt:'Magic Wand'},
+    {src:'https://cdn-icons-png.flaticon.com/256/11218/11218194.png', alt:'Bow Tie'},
+    {src:'https://cdn-icons-png.flaticon.com/256/7602/7602760.png', alt:'Crown'}
+  ];
+  newAccessories.forEach(n => {
+    if(!state.accessories.some(a => a.alt === n.alt)){
+      state.accessories.push(n);
+    }
+  });
+  const lockedIndices = state.accessories.map((a,i) => i).filter(i => !state.unlockedAccessoryIds.includes(i));
+  if(lockedIndices.length === 0) return;
+  const pick = lockedIndices[Math.floor(Math.random()*lockedIndices.length)];
+  state.unlockedAccessoryIds.push(pick);
+  saveState();
+  renderAccessories();
+  notify('Unlocked: ' + state.accessories[pick].alt + ' ✨');
+}
+
+// Habit management UI
+addHabitBtn.addEventListener('click', () => {
+  const txt = newHabitInput.value.trim();
+  if(!txt) return;
+  state.habits.push({title: txt, created: Date.now()});
+  newHabitInput.value = '';
+  saveState();
+  renderHabits();
+  notify('Habit added');
+});
+newHabitInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ addHabitBtn.click(); } });
+
+// Mood change
+moodSelect.addEventListener('change', () => {
+  const m = moodSelect.value;
+  moodAffirmation.textContent = AFF[m] || AFF.neutral;
+  petImg.classList.remove('happy','neutral','sad');
+  if(m === 'happy') petImg.classList.add('happy');
+  else if(m === 'sad') petImg.classList.add('sad');
+});
+
+// Decoration change - update room preview and whole screen background
+decorationSelect.addEventListener('change', () => {
+  state.decoration = decorationSelect.value;
+  updateRoomPreviewAndBackground();
+  saveState();
+});
+
+// Name editable
+petNameEl.addEventListener('input', () => {
+  state.pet.name = petNameEl.textContent.trim();
+  saveState();
+});
+
+// Buttons event handlers
+document.getElementById('feed-btn').addEventListener('click', feedPet);
+document.getElementById('give-water-btn').addEventListener('click', giveWater);
+document.getElementById('sleep-btn').addEventListener('click', sleepPet);
+document.getElementById('bath-btn').addEventListener('click', bathPet);
+document.getElementById('play-btn').addEventListener('click', playPet);
+document.getElementById('habit-btn').addEventListener('click', () => {
+  gainXP(10);
+  const today = new Date().toDateString();
+  const last = state.lastHabitDate ? new Date(state.lastHabitDate) : null;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  if(state.lastHabitDate !== today){
+    if(last && last.toDateString() === yesterday.toDateString()){ state.streak += 1; }
+    else { state.streak = 1; }
+    state.lastHabitDate = today;
+  }
+  notify('Quick habit completed! +10 XP');
+  saveState();
+  updateUI();
+});
+
+document.getElementById('buy-coins-btn').addEventListener('click', () => {
+  state.coins += 50;
+  saveState();
+  updateUI();
+  notify('+50 coins (demo)');
+});
+
+document.getElementById('buy-gems-btn').addEventListener('click', () => {
+  state.gems += 10;     // Add a demo amount of gems
+  saveState();
+  updateUI();
+  notify('+10 gems (demo)');
+});
+
+
+// Initial render and helpers
+function updateUI(){
+  updatePetStatsUI();
+  updateTexts();
+  renderHabits();
+  renderAccessories();
+  updateRoomPreviewAndBackground();
+}
+
+// Initialize defaults if empty
+if(!state.accessories || state.accessories.length === 0) state.accessories = DEFAULT_STATE.accessories;
+
+// load initial UI values to controls
+decorationSelect.value = state.decoration || 'none';
+petNameEl.textContent = state.pet.name || 'Click to name your pet';
+moodSelect.value = 'neutral';
+moodAffirmation.textContent = AFF.neutral;
+
+// run initial update
+updateUI();
+
+// Save periodically
+window.addEventListener('beforeunload', saveState);
+setInterval(saveState, 7000);
+
+const petStageImages = [
+  'image/lumi1.jpg', // Baby
+  'image/lumi2.jpg', // Child
+  'image/lumi3.jpg', // Teen
+  'image/lumi4.jpg', // Adult
+  'image/lumi5.jpg'  // Evolved
+];
+
+const petStageNames = ['Baby', 'Child', 'Teen', 'Adult', 'Evolved'];
+
+const previewButton = document.getElementById('preview-button');
+let previewIndex = 0;
+let previewing = false;
+
+previewButton.addEventListener('click', () => {
+  previewing = true;
+  previewIndex = (previewIndex + 1) % petStageImages.length;
+  petImg.src = petStageImages[previewIndex];
+
+  // Update overlay text as well
+  document.getElementById('pet-stage-label').textContent = petStageNames[previewIndex];
+
+  petLevelEl.textContent = `Pet Preview: ${petStageNames[previewIndex]}`;
+
+  setTimeout(() => {
+    previewing = false;
+    updatePetStageDisplay();
+  }, 1000);
+});
+
+function updatePetStageDisplay(){
+  if(previewing) return; 
+  let stage = state.pet.currentStage;
+  petImg.src = petStageImages[stage];
+  petLevelEl.textContent = `Level: ${petStageNames[stage]} (Gems: ${state.gems}, Coins: ${state.coins})`;
+  const stageLabel = document.getElementById('pet-stage-label');
+  stageLabel.textContent = petStageNames[stage];
+}
+
+
+
+
+</script>
+
+</body>
+</html>
