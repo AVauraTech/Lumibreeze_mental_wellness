@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lumi Sanctuary — 3D Companion World</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/OrbitControls.js": "./vendor/three/OrbitControls.js"
+  }
+}
+</script>
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;font-family:'Outfit',system-ui,sans-serif;background:#07101f;color:#eaf2ff}
+  canvas#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+  .panel{
+    position:fixed;z-index:10;
+    background:rgba(10,22,42,0.72);
+    backdrop-filter:blur(14px) saturate(140%);
+    border:1px solid rgba(120,180,255,0.22);
+    border-radius:16px;
+    padding:14px 16px;
+    box-shadow:0 10px 34px rgba(0,0,0,0.4);
+  }
+  .panel h2{margin:0 0 10px;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:#7fd4ff;font-weight:800}
+
+  /* Top bar */
+  #topbar{top:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;padding:10px 20px}
+  #topbar .name{font-size:1.15rem;font-weight:800}
+  #topbar .chip{font-size:.82rem;padding:4px 11px;border-radius:999px;background:rgba(127,212,255,0.14);border:1px solid rgba(127,212,255,0.3);color:#bfe8ff;font-weight:600}
+  #xp-track{width:150px;height:8px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden}
+  #xp-fill{height:100%;width:0;background:linear-gradient(90deg,#7b3ff5,#d07af8);transition:width .4s}
+
+  /* Left: vitals */
+  #vitals{top:86px;left:14px;width:250px}
+  .stat{margin-bottom:9px}
+  .stat .row{display:flex;justify-content:space-between;font-size:.82rem;color:#a9c6e8;margin-bottom:3px;font-weight:600}
+  .track{height:8px;border-radius:999px;background:rgba(255,255,255,0.1);overflow:hidden}
+  .fill{height:100%;width:0;border-radius:999px;transition:width .45s,background .45s}
+  .fill.high{background:linear-gradient(90deg,#6fdc8c,#3fbf6f)}
+  .fill.mid{background:linear-gradient(90deg,#ffd166,#f4a259)}
+  .fill.low{background:linear-gradient(90deg,#ff8fa3,#e63946)}
+
+  /* Right: world controls */
+  #world-panel{top:86px;right:14px;width:236px}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:.76rem;color:#a9c6e8;margin-bottom:4px;font-weight:600;letter-spacing:.04em}
+  select,input[type=text]{
+    width:100%;padding:7px 9px;border-radius:9px;border:1px solid rgba(120,180,255,0.25);
+    background:rgba(6,16,32,0.8);color:#eaf2ff;font-family:inherit;font-size:.86rem;outline:none
+  }
+  select:focus,input:focus{border-color:#7fd4ff}
+  input[type=range]{width:100%;accent-color:#7fd4ff}
+  .switchline{display:flex;align-items:center;gap:8px;font-size:.8rem;color:#a9c6e8;margin-bottom:8px}
+
+  /* Bottom: actions */
+  #actions{bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;justify-content:center;max-width:92vw}
+  #actions button{
+    padding:9px 14px;border-radius:11px;border:1px solid rgba(120,180,255,0.25);
+    background:linear-gradient(135deg,rgba(123,63,245,0.5),rgba(24,120,200,0.4));
+    color:#fff;font-family:inherit;font-weight:700;font-size:.86rem;cursor:pointer;
+    transition:transform .16s,box-shadow .16s
+  }
+  #actions button:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(123,63,245,0.45)}
+  #actions button:active{transform:translateY(0)}
+
+  /* Bottom-left: biometrics + traits */
+  #bio{bottom:16px;left:14px;width:250px}
+  .readout{display:flex;justify-content:space-between;font-size:.82rem;color:#cfe3ff;margin-bottom:5px}
+  .readout b{color:#fff;font-weight:700}
+  .bio-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .bio-btns button{
+    flex:1;min-width:66px;padding:6px 8px;border-radius:9px;border:1px solid rgba(120,180,255,0.25);
+    background:rgba(6,16,32,0.7);color:#bfe8ff;font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer
+  }
+  .bio-btns button:hover:not(:disabled){background:rgba(127,212,255,0.18)}
+  .bio-btns button:disabled{opacity:.38;cursor:not-allowed}
+  .sim-warn{font-size:.7rem;color:#ffcf7f;margin-top:7px;line-height:1.35}
+  .traits{margin-top:11px;border-top:1px solid rgba(120,180,255,0.16);padding-top:9px}
+
+  /* Toast */
+  #toast{
+    position:fixed;left:50%;bottom:96px;transform:translate(-50%,14px);z-index:40;
+    background:rgba(8,18,36,0.94);border:1px solid rgba(127,212,255,0.35);
+    padding:11px 20px;border-radius:13px;font-weight:600;font-size:.9rem;color:#dff0ff;
+    opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;max-width:86vw;text-align:center
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* Breathing quest */
+  #breath-overlay{
+    position:fixed;inset:0;z-index:50;background:rgba(4,10,22,0.93);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
+    opacity:0;pointer-events:none;transition:opacity .5s
+  }
+  #breath-overlay.show{opacity:1;pointer-events:auto}
+  .breath-orb{
+    width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#d6f2ff,#3db3e2 55%,#12557e);
+    box-shadow:0 0 60px #3db3e2aa;transform:scale(.7);
+    transition:transform 4s cubic-bezier(.4,0,.3,1),box-shadow 4s
+  }
+  .breath-orb.in{transform:scale(1.25);box-shadow:0 0 100px #7fd4ffdd}
+  .breath-orb.hold{transform:scale(1.25);transition-duration:.4s}
+  .breath-orb.out{transform:scale(.7);transition-duration:5s}
+  #breath-label{font-size:1.5rem;font-weight:700;letter-spacing:.06em;color:#dff0ff}
+  #breath-overlay p{max-width:430px;text-align:center;color:#a9c6e8;margin:0;line-height:1.55}
+  #breath-close{
+    padding:9px 22px;border-radius:11px;border:1px solid rgba(120,180,255,0.3);
+    background:transparent;color:#bfe8ff;font-family:inherit;font-weight:700;cursor:pointer
+  }
+
+  #fatal{
+    position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;
+    padding:40px;text-align:center;background:#07101f;color:#ff9fb0;font-size:1.05rem;line-height:1.6
+  }
+
+  #home-link{
+    position:fixed;top:14px;left:14px;z-index:20;width:44px;height:44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.3rem;
+    background:rgba(10,22,42,0.78);border:1px solid rgba(120,180,255,0.28)
+  }
+  #home-link:hover{background:rgba(127,212,255,0.2)}
+
+  @media (max-width:1080px){
+    #world-panel,#bio{display:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="fatal" hidden></div>
+
+<a id="home-link" href="home.html" title="Back to dashboard">🏠</a>
+
+<div class="panel" id="topbar">
+  <span class="name" id="hud-name">Lumi</span>
+  <span class="chip" id="hud-stage">Baby</span>
+  <div id="xp-track"><div id="xp-fill"></div></div>
+  <span class="chip" id="hud-xp">0 / 100 XP</span>
+  <span class="chip">🪙 <b id="hud-coins">0</b></span>
+  <span class="chip">💎 <b id="hud-gems">0</b></span>
+  <span class="chip">🔥 <b id="hud-streak">0</b></span>
+</div>
+
+<div class="panel" id="vitals">
+  <h2>Vitals</h2>
+  <div class="stat"><div class="row"><span>Hunger</span><span id="val-hunger">0</span></div><div class="track"><div class="fill high" id="bar-hunger"></div></div></div>
+  <div class="stat"><div class="row"><span>Thirst</span><span id="val-thirst">0</span></div><div class="track"><div class="fill high" id="bar-thirst"></div></div></div>
+  <div class="stat"><div class="row"><span>Happiness</span><span id="val-happiness">0</span></div><div class="track"><div class="fill high" id="bar-happiness"></div></div></div>
+  <div class="stat"><div class="row"><span>Energy</span><span id="val-energy">0</span></div><div class="track"><div class="fill high" id="bar-energy"></div></div></div>
+  <div class="stat"><div class="row"><span>Cleanliness</span><span id="val-cleanliness">0</span></div><div class="track"><div class="fill high" id="bar-cleanliness"></div></div></div>
+  <div class="stat"><div class="row"><span>Health</span><span id="val-health">0</span></div><div class="track"><div class="fill high" id="bar-health"></div></div></div>
+</div>
+
+<div class="panel" id="world-panel">
+  <h2>World</h2>
+  <div class="field">
+    <label for="name-input">Lumi's name</label>
+    <input type="text" id="name-input" maxlength="18" placeholder="Name your Lumi" />
+  </div>
+  <div class="field">
+    <label for="biome-select">Biome</label>
+    <select id="biome-select"></select>
+  </div>
+  <div class="field">
+    <label for="weather-select">Weather</label>
+    <select id="weather-select"></select>
+  </div>
+  <div class="field">
+    <label for="time-slider">Time of day — <span id="time-label">12:00 PM</span></label>
+    <input type="range" id="time-slider" min="0" max="24" step="0.1" value="12" />
+    <div class="switchline"><input type="checkbox" id="auto-time" /><span>Follow real clock (1 min = 1 hour)</span></div>
+  </div>
+  <div class="field">
+    <label for="quality-select">Quality</label>
+    <select id="quality-select">
+      <option value="high">High (shadows, 2x DPR)</option>
+      <option value="balanced">Balanced</option>
+    </select>
+  </div>
+  <div class="switchline"><button id="sound-toggle" style="padding:6px 12px;border-radius:9px;border:1px solid rgba(120,180,255,0.25);background:rgba(6,16,32,0.7);color:#bfe8ff;cursor:pointer">🔊</button><span>Ambience &amp; effects</span></div>
+</div>
+
+<div class="panel" id="bio">
+  <h2>Biometrics</h2>
+  <div class="readout"><span>Source</span><b id="bio-source">Off</b></div>
+  <div class="readout"><span>Heart rate</span><b id="bio-hr">—</b></div>
+  <div class="readout"><span>HRV (RMSSD)</span><b id="bio-hrv">—</b></div>
+  <div class="readout"><span>Stress</span><b id="bio-stress-text">—</b></div>
+  <div class="track"><div class="fill high" id="bio-stress-fill" style="width:0"></div></div>
+  <div class="bio-btns">
+    <button id="bio-bluetooth">Pair BT</button>
+    <button id="bio-sim">Simulate</button>
+    <button id="bio-spike">Spike</button>
+    <button id="bio-off">Off</button>
+  </div>
+  <p class="sim-warn">⚠️ The simulator produces synthetic readings so stress-reactive behaviour can be demonstrated without a heart-rate sensor. Only a paired Bluetooth device gives real data.</p>
+  <div class="traits">
+    <h2 style="margin-bottom:8px">Personality</h2>
+    <div class="stat"><div class="row"><span>Empathy</span></div><div class="track"><div class="fill high" id="trait-empathy"></div></div></div>
+    <div class="stat"><div class="row"><span>Playfulness</span></div><div class="track"><div class="fill high" id="trait-play"></div></div></div>
+    <div class="stat"><div class="row"><span>Calm</span></div><div class="track"><div class="fill high" id="trait-calm"></div></div></div>
+  </div>
+  <button id="breath-start" class="bio-btns" style="width:100%;margin-top:10px;padding:9px">🧘 Start breathing quest</button>
+</div>
+
+<div class="panel" id="actions">
+  <button id="act-feed">🍖 Feed</button>
+  <button id="act-water">💧 Water</button>
+  <button id="act-play">🎾 Play</button>
+  <button id="act-bath">🛁 Bath</button>
+  <button id="act-sleep">🛌 Sleep</button>
+  <button id="act-habit">✅ Check-in</button>
+</div>
+
+<div id="toast"></div>
+
+<div id="breath-overlay">
+  <div class="breath-orb in" id="breath-orb"></div>
+  <div id="breath-label">Breathe in · 4s</div>
+  <p>Breathe with the orb — in for 4, hold for 3, out for 5. Three cycles calms both you and Lumi.</p>
+  <button id="breath-close">End session</button>
+</div>
+
+<script type="module" src="js/sanctuary/main.js"></script>
+</body>
+</html>
