@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🚭 Recovery Support – LumiBreeze</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dceefb, #fef6fb);
+      margin: 0; padding: 0; color: #333; overflow-x: hidden;
+    }
+    header, nav {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: #fff8;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: #4a4e69;
+    }
+    .main {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    nav button {
+      margin: 0.4rem;
+      background: #f2e9f7;
+      color: #4a4e69;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav button.active {
+      background: #89c2d9;
+      color: #fff;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+      animation: fadeIn 1s;
+    }
+    .counter, .streak, .money, .health {
+      font-size: 1.2rem;
+      margin: 0.7rem 0;
+    }
+    .badges img {
+      height: 44px;
+      margin: 0.4rem;
+    }
+    .milestone {
+      font-weight: bold;
+      color: #4caf50;
+    }
+    .craving, .trigger, .add-journal {
+      margin-top: 1rem;
+    }
+    .chart-canvas {
+      width: 95%;
+      max-width: 450px;
+      height: 220px;
+      background: #f1f1f1;
+      margin: 0.7rem 0;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .button-main {
+      background: #89c2d9;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 0.5rem;
+    }
+    .button-main:hover {
+      background: #61a5c2;
+    }
+    .distractions {
+      display: none;
+      background: #fff3cd;
+      padding: 1rem;
+      border-left: 6px solid #ffc107;
+      margin-top: 1rem;
+    }
+    .replacement-habits h4 {
+      margin-top: 1.2rem;
+    }
+    .milestone-badge {
+      display: inline-block;
+      margin: 0.3rem;
+    }
+    .input-mini {
+      padding: 0.3rem;
+      margin: 0.2rem 0;
+    }
+    .progress-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    .progress-table th, .progress-table td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #eaeaea;
+      text-align: left;
+    }
+    .quest-list li, .news-list li {
+      margin-bottom: 0.4rem;
+    }
+    .news-list iframe {
+      width: 320px;
+      height: 180px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+    }
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 90px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 150px;
+      right: 30px;
+    }
+      footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>🌈 Recovery Support – Quit Smoking/Drinking</h1>
+  <p>Your journey starts here. Every clean day is a victory!</p>
+</header>
+  <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+<nav>
+  <button onclick="showTab('dashboard')" class="active">Home</button>
+  <button onclick="showTab('recovery')">Recovery</button>
+  <button onclick="showTab('urge')">Urge Help</button>
+  <button onclick="showTab('edu')">Education</button>
+  <button onclick="showTab('gamify')">Quests</button>
+  <button onclick="showTab('insight')">Insights</button>
+</nav>
+
+<div class="main">
+
+  <!-- Home/Dashboard -->
+  <div class="section active" id="dashboard">
+    <div class="counter"><strong>Days Clean:</strong> <span id="dayCounter">0</span></div>
+    <div class="streak">🔥 <strong>Current Streak:</strong> <span id="streak">0</span> days</div>
+    <div class="streak">🏅 <strong>Longest Streak:</strong> <span id="longestStreak">0</span> days</div>
+    <div class="money">💰 <strong>Money Saved:</strong> ₹<span id="moneySaved">0</span> <span id="rewardEq"></span></div>
+    <div class="health">❤️ <strong>Recovery Timeline:</strong> <span id="recoveryTimeline"></span></div>
+    <div class="milestone" id="milestone"></div>
+    <div class="badges" id="badges"></div>
+    <button class="button-main" onclick="incrementDays()">+1 Day</button>
+    <button class="button-main" onclick="resetDays()">Reset</button>
+    <div id="encouragement"></div>
+  </div>
+
+  <!-- Recovery Section -->
+  <div class="section" id="recovery">
+    <div class="add-journal">
+      <h4>📝 Relapse/Reflection Journal</h4>
+      <input class="input-mini" type="text" id="journalEntry" placeholder="What triggered you?">
+      <button class="button-main" onclick="addJournal()">Add Entry</button>
+      <ul id="journalList"></ul>
+    </div>
+    <div class="craving">
+      <h4>😵 Craving Log</h4>
+      <input class="input-mini" type="number" min="1" max="10" id="urgeRating" placeholder="Urge (1–10)">
+      <button class="button-main" onclick="logCraving()">Log Urge</button>
+      <ul id="cravingList"></ul>
+    </div>
+    <button class="button-main" onclick="resetDays()">Log Relapse (Reset)</button>
+  </div>
+
+  <!-- Urge Help Section -->
+  <div class="section" id="urge">
+    <button class="button-main" onclick="showDistractions()">💥 Craving SOS</button>
+    <div class="distractions" id="distractionBox">
+      <strong>Quick Distractions</strong>
+      <ul>
+        <li>Write in your journal</li>
+        <li>Go for a short walk</li>
+        <li>Play a quick calming game</li>
+        <li>Listen to calming music</li>
+        <li>Text a friend or support buddy</li>
+      </ul>
+      <button class="button-main" onclick="hideDistractions()">Close</button>
+    </div>
+    <div class="replacement-habits">
+      <h4>🧩 Replacement Habits</h4>
+      <ul id="habitsList">
+        <li>Chew gum or toothpick</li>
+        <li>Cold shower or splash water</li>
+        <li>5-minute meditation</li>
+        <li>Coloring or drawing</li>
+        <li>Use a stress ball</li>
+      </ul>
+      <input class="input-mini" type="text" id="customHabit" placeholder="Add your own">
+      <button class="button-main" onclick="addHabit()">Add Habit</button>
+    </div>
+    <div class="trigger">
+      <h4>📍 Trigger Mapping</h4>
+      <input class="input-mini" type="text" id="triggerEntry" placeholder="e.g. Location, feeling">
+      <button class="button-main" onclick="addTrigger()">Log Trigger</button>
+      <ul id="triggerList"></ul>
+    </div>
+  </div>
+
+  <!-- Education Section -->
+  <div class="section" id="edu">
+    <div class="fact">
+      <h4>📖 Daily Fact / Myth Buster</h4>
+      <p id="dailyFact"></p>
+      <button class="button-main" onclick="nextFact()">Next Fact</button>
+    </div>
+    <div>
+      <h4>📰 Knowledge Hub</h4>
+      <ul class="news-list">
+        <li>
+          <h5>Risks of smoking/drinking and Benefits of quitting</h5>
+          <iframe src="https://www.youtube.com/embed/o3I0mJ2RfU0" allowfullscreen></iframe>
+          <iframe src="https://www.youtube.com/embed/bOQxOthLSCA" allowfullscreen></iframe>
+        </li>
+        <li>
+          <h5>Real recovery stories</h5>
+          <iframe src="https://www.youtube.com/embed/6eCktvGBkeo" allowfullscreen></iframe>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gamification/Quests Section -->
+  <div class="section" id="gamify">
+    <div class="quest-list">
+      <h4>🎮 Recovery Quests</h4>
+      <ul>
+        <li>Stay clean for 7 days – unlock achievement</li>
+        <li>Log cravings for a week</li>
+        <li>Complete a mindfulness session</li>
+        <li>Reflect on a trigger in your journal</li>
+      </ul>
+      <button class="button-main" onclick="location.href='index.html'">Play Mini-Game</button>
+    </div>
+    <div>
+      <h4>🏆 Custom Rewards</h4>
+      <p>
+        If you reach
+        <input id="rewardDays" class="input-mini" type="number" placeholder="X days" />
+        , reward:
+        <input id="rewardName" class="input-mini" type="text" placeholder="Your Gift" />
+        <button class="button-main" onclick="setCustomReward()">Set</button>
+      </p>
+      <div id="customRewardMsg"></div>
+    </div>
+  </div>
+
+  <!-- Insights Section -->
+  <div class="section" id="insight">
+    <div>
+      <h4>📈 Progress Charts</h4>
+      <table class="progress-table">
+        <tr><th>Metric</th><th>This Week</th><th>This Month</th></tr>
+        <tr><td>Clean Days</td><td id="weekDays">0</td><td id="monthDays">0</td></tr>
+        <tr><td>Money Saved</td><td id="weekMoney">0</td><td id="monthMoney">0</td></tr>
+        <tr><td>Urges Logged</td><td id="weekUrges">0</td><td id="monthUrges">0</td></tr>
+      </table>
+    </div>
+    <div class="reports">
+      <h4>🗒️ Weekly/Monthly Reports</h4>
+      <button class="button-main" onclick="generateReport()">Generate Report</button>
+      <div id="reportMsg"></div>
+    </div>
+  </div>
+
+</div>
+ <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+
+<script>
+  // --- State ---
+  let daysClean = 0, longestStreak = 0, weekDays = 0, monthDays = 0;
+  let moneySaved = 0, dailySpend = 100; // Average spending (edit as needed)
+  let communityDays = 1203045; // Demo stat
+  let customGoal = 'quit', customTheme = 'default';
+  let journalEntries = [], cravings = [], triggers = [], habits = [
+    "Chew gum or toothpick","Cold shower or splash water","5-minute meditation","Coloring or drawing","Use a stress ball"
+  ], moods = [], sleeps = [], energies = [];
+  let customReward = {days:0, item:""}, rewardEq = "";
+  let urgeCountWeek = 0, urgeCountMonth = 0, reportMsg = "";
+  const facts = [
+    "Myth: One drink helps you sleep. Fact: It reduces deep sleep.",
+    "After 24 hours smoke-free: Oxygen levels improve.",
+    "In 1 week quit: Taste & smell start to recover.",
+    "After 1 year alcohol-free: Heart risk halves.",
+    "Most cravings last under 10 minutes. Distract yourself!",
+    "You can replace smoking triggers: Try journaling or meditation instead."
+  ];
+  let factIndex = 0;
+
+  // --- General Tab Handling ---
+  function showTab(tabId) {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => {
+      if(b.textContent.toLowerCase().includes(tabId)) b.classList.add('active');
+    });
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  // --- Core Features ---
+  function incrementDays() {
+    daysClean++;
+    longestStreak = Math.max(longestStreak, daysClean);
+    moneySaved = daysClean * dailySpend;
+    if(daysClean % 7 === 0) weekDays = daysClean;
+    if(daysClean % 30 === 0) monthDays = daysClean;
+    updateDisplay();
+  }
+  function resetDays() {
+    daysClean = 0;
+    updateDisplay();
+  }
+  function updateDisplay() {
+    document.getElementById("dayCounter").innerText = daysClean;
+    document.getElementById("streak").innerText = daysClean;
+    document.getElementById("moneySaved").innerText = moneySaved;
+    document.getElementById("milestone").innerText = '';
+    document.getElementById("badges").innerHTML = '';
+    document.getElementById("longestStreak").innerText = longestStreak;
+    document.getElementById("rewardEq").innerText = rewardEq;
+    document.getElementById("recoveryTimeline").innerText = getRecoveryTimeline(daysClean);
+    document.getElementById("encouragement").innerText = getEncouragementMessage(daysClean);
+    showMilestones(daysClean);
+    document.getElementById("communityDays").innerText = communityDays + daysClean;
+    document.getElementById("weekDays").innerText = weekDays;
+    document.getElementById("monthDays").innerText = monthDays;
+    document.getElementById("weekMoney").innerText = weekDays * dailySpend;
+    document.getElementById("monthMoney").innerText = monthDays * dailySpend;
+    document.getElementById("weekUrges").innerText = urgeCountWeek;
+    document.getElementById("monthUrges").innerText = urgeCountMonth;
+    if(customReward.days && daysClean >= customReward.days) {
+      document.getElementById("customRewardMsg").innerText = `🎁 You've earned: ${customReward.item}`;
+    } else {
+      document.getElementById("customRewardMsg").innerText = "";
+    }
+  }
+  function getRecoveryTimeline(days) {
+    if(days < 1) return "Oxygen levels start to improve.";
+    if(days < 7) return "Taste & smell begin to recover.";
+    if(days < 30) return "Lung function improving.";
+    if(days < 365) return "Heart health is getting stronger.";
+    return "Heart risk halved. You're a recovery champ!";
+  }
+  function getEncouragementMessage(days) {
+    if(days < 3) return "Keep going! Each moment matters.";
+    if(days < 7) return "You’re getting stronger. Stay steady!";
+    if(days < 30) return "You're building a new life. Be proud!";
+    if(days < 100) return "Amazing resilience. You inspire others!";
+    return "Legend! Your progress is life-changing.";
+  }
+  function showMilestones(days) {
+    let badges = '';
+    if(days >= 3) badges += badgeHtml("3-Day", "🎉", "https://cdn-icons-png.flaticon.com/128/1828/1828884.png");
+    if(days >= 7) badges += badgeHtml("7-Day", "🏅", "https://cdn-icons-png.flaticon.com/128/1828/1828970.png");
+    if(days >= 30) badges += badgeHtml("30-Day", "🌟", "https://cdn-icons-png.flaticon.com/128/1828/1828911.png");
+    if(days >= 100) badges += badgeHtml("100-Day", "🎖", "https://cdn-icons-png.flaticon.com/128/2262/2262220.png");
+    if(days >= 365) badges += badgeHtml("1-Year", "🏆", "https://cdn-icons-png.flaticon.com/128/3094/3094859.png");
+    document.getElementById("badges").innerHTML = badges;
+
+    let mTxt = '';
+    if(days >= 365) mTxt = "🏆 1-Year Recovery Milestone!";
+    else if(days >= 100) mTxt = "🎖 100-Day Champion!";
+    else if(days >= 30) mTxt = "🌟 30-Day Achiever!";
+    else if(days >= 7) mTxt = "🏅 7-Day Winner!";
+    else if(days >= 3) mTxt = "🎉 3-Day Milestone!";
+    document.getElementById("milestone").innerText = mTxt;
+  }
+  function badgeHtml(label, emoji, url) {
+    return `<span class="milestone-badge" title="${label}">${emoji}<img src="${url}" alt="${label} badge"/></span>`;
+  }
+
+  // --- Journal, Cravings, Triggers ---
+  function addJournal() {
+    const entry = document.getElementById("journalEntry").value.trim();
+    if(entry) {
+      journalEntries.push(entry);
+      document.getElementById("journalEntry").value = '';
+      renderList("journalList", journalEntries);
+    }
+  }
+  function logCraving() {
+    const urge = parseInt(document.getElementById("urgeRating").value || 0);
+    if(urge && urge >= 1 && urge <= 10) {
+      cravings.push(urge);
+      document.getElementById("urgeRating").value = '';
+      renderList("cravingList", cravings.map(u => `Craving intensity: ${u}`));
+      urgeCountWeek++;
+      urgeCountMonth++;
+      updateDisplay();
+    }
+  }
+  function addTrigger() {
+    const entry = document.getElementById("triggerEntry").value.trim();
+    if(entry) {
+      triggers.push(entry);
+      document.getElementById("triggerEntry").value = '';
+      renderList("triggerList", triggers);
+    }
+  }
+  function addHabit() {
+    const habit = document.getElementById("customHabit").value.trim();
+    if(habit) {
+      habits.push(habit);
+      document.getElementById("customHabit").value = '';
+      renderList("habitsList", habits);
+    }
+  }
+  function renderList(id, list) {
+    document.getElementById(id).innerHTML = list.map(x => `<li>${x}</li>`).join("");
+  }
+  function showDistractions() {
+    document.getElementById("distractionBox").style.display = "block";
+  }
+  function hideDistractions() {
+    document.getElementById("distractionBox").style.display = "none";
+  }
+
+  // --- Facts, Knowledge Hub ---
+  function nextFact() {
+    factIndex = (factIndex + 1) % facts.length;
+    document.getElementById("dailyFact").innerText = facts[factIndex];
+  }
+
+  // --- Gamification / Rewards ---
+  function setCustomReward() {
+    const days = parseInt(document.getElementById("rewardDays").value || 0);
+    const item = document.getElementById("rewardName").value.trim();
+    if(days > 0 && item) {
+      customReward = { days, item };
+      rewardEq = `- enough for: ${item}`;
+      updateDisplay();
+    }
+  }
+
+  // --- Insights / Reports ---
+  function generateReport() {
+    reportMsg = `This week: Clean Days: ${weekDays}, Money Saved: ₹${weekDays*dailySpend}, Urges logged: ${urgeCountWeek}.`;
+    reportMsg += ` This month: Clean Days: ${monthDays}, Money Saved: ₹${monthDays*dailySpend}, Urges logged: ${urgeCountMonth}.`;
+    document.getElementById("reportMsg").innerText = reportMsg;
+  }
+
+  // --- Initialization ---
+  window.onload = function() {
+    updateDisplay();
+    nextFact();
+  }
+</script>
+</body>
+</html>
