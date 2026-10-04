@@ -381,4 +381,4 @@ npx vitest run --coverage
 
 ---
 
-*Designed and developed by Anushka Vidyarthy*
+*Designed and developed by Anushka Vidyarthy.*
