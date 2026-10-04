@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Jungle-Jumble — Adaptive Memory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="home-link" href="home.html" aria-label="Back to LumiBreeze home">🏠</a>
+  <h1 class="fun-title">JUNGLE-JUMBLE</h1>
+  <p class="tagline">The board adapts to how you play.</p>
+
+  <div class="control-bar">
+    <select id="difficulty" class="difficulty" aria-label="Difficulty mode"></select>
+    <button id="pause-btn" title="Pause/Resume" aria-label="Pause or resume">⏸️</button>
+    <button id="sound-toggle" title="Sound On/Off" aria-label="Toggle sound">🔈</button>
+    <button id="hint-btn" title="Hint" aria-label="Show a hint">💡</button>
+    <label class="switch" title="Dark mode">
+      <input type="checkbox" id="darkToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div id="tier-badge" class="tier-badge" aria-live="polite">Easy · 4×4 · 8 pairs</div>
+
+  <p class="info">
+    🐾 <span class="label">Moves:</span> <span id="moves">0</span>
+    | ⏱️ <span class="label">Time:</span> <span id="timer">0</span> sec
+  </p>
+
+  <div class="stress-meter" aria-hidden="false">
+    <div class="stress-track"><div id="stress-fill" class="stress-fill calm"></div></div>
+    <span id="stress-label">Flow pressure 0% · accuracy 0%</span>
+  </div>
+
+  <button id="restart">Retry the Rumble!</button>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <div class="game-board" id="game-board"></div>
+
+  <div class="popup" id="popup" tabindex="0" role="dialog" aria-label="Round complete">
+    <h2>🎉 You Won!</h2>
+    <p>You finished in <span id="final-moves"></span> moves<br>
+       and <span id="final-time"></span> seconds!</p>
+    <p class="highscore-line"></p>
+    <p id="xp-reward" class="xp-reward"></p>
+    <button id="play-again">🔁 Play Again</button>
+  </div>
+
+  <div class="mindful" id="mindful" role="alertdialog" aria-label="Mindful break">
+    <div class="mindful-inner">
+      <div class="mindful-orb" id="mindful-orb"></div>
+      <p id="mindful-text"></p>
+      <span id="mindful-count" class="mindful-count"></span>
+    </div>
+  </div>
+
+  <footer class="footer-credits">
+    <div id="easterEgg" role="button" tabindex="0" aria-label="Secret egg" title="Click me!"></div>
+    <div id="eggMessage"></div>
+  </footer>
+  <script type="module" src="script.js?v=2"></script>
+</body>
+</html>
