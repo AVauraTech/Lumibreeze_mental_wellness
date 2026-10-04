@@ -379,6 +379,6 @@ npx vitest run --coverage
 - [x] **Developer tooling** — `.debug/static-server.js` and `.debug/save-server.js` included for local development and frame capture
 - [x] **Privacy by design** — No accounts, no telemetry, no third-party data processors; all PII (user name, journal text) stays on-device
 
----
+--
 
 *Designed and developed by Anushka Vidyarthy.*
