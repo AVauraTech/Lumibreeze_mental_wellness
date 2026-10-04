@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calming Activities & Exercises</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --calm-grad: linear-gradient(120deg,#f6fdff 20%,#ccf2f4 100%);
+      --breath-grad: linear-gradient(135deg,#e0f7fa 60%,#fad0c4 100%);
+      --bg-header: linear-gradient(80deg,#e0f7fa 70%,#fffde4 100%);
+      --main-accent: #00bcd4;
+      --calm-bar: #b2ebf2;
+    }
+    body {
+      margin:0;
+      font-family:'Outfit',sans-serif;
+      background: var(--calm-grad);
+      color:#006064;
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
+
+    .header {
+      background: var(--bg-header);
+      text-align:center;
+      padding:2.6em 1em 1.3em;
+      border-bottom:2px solid var(--calm-bar);
+      box-shadow:0 2px 22px rgba(71,226,220,0.09);
+    }
+    .header h1 {
+      margin:0;
+      font-weight:900;
+      font-size:2.6em;
+      color:#006764;
+      text-shadow:0 2px 9px #fff4;
+    }
+    .header p {
+      font-size:1.2em;
+      color:#00838f;
+      margin:.7em 0 0;
+      font-weight:500;
+    }
+
+    .main-content { flex:1; padding:2em; }
+    .main-content h2 {
+      margin-top:1.5em;
+      font-size:1.8em;
+      font-weight:900;
+      color:#0097a7;
+      background: linear-gradient(95deg,#00bcd4 30%,#ffd8b0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Breathing */
+    .breathe-box {
+      margin:1.1em 0 2em;
+      background: var(--breath-grad);
+      border-radius:20px;
+      text-align:center;
+      padding:1.5em 1em;
+      box-shadow:0 .5em 3em #aee3e024;
+    }
+    #breathCircle {
+      width:120px; height:120px;
+      border-radius:50%;
+      border:4px solid #48d1cc;
+      background:radial-gradient(circle,#fff 78%,#b2ebf2 99%,#fff0 100%);
+      box-shadow:0 6px 20px #7edbd573;
+      margin:0.5em auto;
+      transition: transform 3s ease-in-out;
+    }
+    .breath-btns button {
+      background: var(--main-accent);
+      color:#fff;
+      padding:0.7em 1.3em;
+      border:none;
+      border-radius:10px;
+      margin:.4em;
+      cursor:pointer;
+      font-weight:600;
+      transition: background .18s;
+    }
+    .breath-btns button.selected {
+      background:#ffd8b0; color:#00838f;
+    }
+
+    /* Grounding */
+    .grounding-section {
+      background: #fff8fb;
+      padding:1.3em;
+      border-radius: 15px;
+      margin:2em 0 1.5em;
+      box-shadow: 0 1px 12px #b2ebf215;
+    }
+    .ground-step {
+      margin:.8em 0;
+      padding:.9em 1em;
+      background:#e0f7fa;
+      border-radius:12px;
+      font-size:1.1em;
+      color:#004d40;
+      font-weight:600;
+      animation: fadeInStep .7s ease backwards;
+    }
+    @keyframes fadeInStep {
+      0% {opacity:0; transform:translateY(2em);}
+      100%{opacity:1; transform:none;}
+    }
+
+    /* Distract Me */
+    .distract-btn {
+      background: linear-gradient(92deg,#fceabb 20%,#b2ebf2 90%);
+      border:none;
+      border-radius:12px;
+      color:#004d40;
+      padding:1em 2.5em;
+      font-size:1.2em;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow: 0 4px 24px #fceabb51;
+      transition: transform .11s;
+    }
+    .distract-btn:active { transform:scale(.97); }
+    #distractOut {
+      margin-top:1.1em;
+      min-height:36px;
+      font-size:1.1em;
+      color:#ff9100;
+      font-weight:600;
+      text-align:center;
+    }
+
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 90px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 150px;
+      right: 30px;
+    }
+
+    /* Sounds */
+    .sound-container {
+      display:flex;
+      justify-content:center;
+      gap:30px;
+      flex-wrap:wrap;
+      margin-top:1.2em;
+    }
+    .sound-btn {
+      width:100px; height:100px;
+      border-radius:50%;
+      border:none;
+      background:#fff;
+      box-shadow:0 4px 8px rgba(0,0,0,0.2);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      font-size:2rem;
+      transition:transform 0.3s, background 0.3s;
+    }
+    .sound-btn:hover { transform: scale(1.1); background:#e0f7f7; }
+    .caption { margin-top:20px; text-align:center; font-size:1em; color:#607d8b; }
+
+    @media(max-width:700px){ .main-content{padding:1em;} }
+
+      footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>✨ Calming Activities & Exercises ✨</h1>
+    <p>Reset, breathe, and ground yourself anytime – choose an activity below for quick relief.</p>
+  </div>
+
+  <div class="main-content">
+     <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+    <!-- Breathing -->
+    <h2>1️⃣ Guided Breathing</h2>
+    <div class="breathe-box">
+      <div id="breathCircle"></div>
+      <div id="breathPrompt" style="font-weight:600;font-size:1.1em;color:#0097a7;">Inhale…</div>
+      <div class="breath-btns">
+        <button onclick="setBreath(2)" id="btn2">2 min</button>
+        <button onclick="setBreath(3)" id="btn3" class="selected">3 min</button>
+        <button onclick="setBreath(5)" id="btn5">5 min</button>
+      </div>
+    </div>
+
+    <!-- Grounding -->
+    <h2>2️⃣ 5-4-3-2-1 Grounding</h2>
+    <div class="grounding-section">
+      <div id="groundingSteps"></div>
+      <button onclick="nextStep()" id="stepBtn" class="distract-btn">Next Grounding Step ▶️</button>
+    </div>
+
+    <!-- Distract Me -->
+    <h2>3️⃣ “Distract Me” Calming Button</h2>
+    <div style="text-align:center">
+      <button class="distract-btn" onclick="calmDistract()">Distract Me Now 🌀</button>
+      <div id="distractOut"></div>
+    </div>
+
+    <!-- Sounds -->
+    <h2>🎧 Relax with Ambient Sounds</h2>
+    <div class="sound-container">
+      <button class="sound-btn" onclick="playSound('rain')" aria-label="Rain Sound">🌧️</button>
+      <button class="sound-btn" onclick="playSound('waves')" aria-label="Ocean Waves">🌊</button>
+      <button class="sound-btn" onclick="playSound('forest')" aria-label="Forest Sounds">🌲</button>
+      <button class="sound-btn" onclick="playSound('white')" aria-label="White Noise">🔊</button>
+    </div>
+    <div class="caption">Click an icon to play relaxing sounds 🌿</div>
+
+    <!-- Audio files (replace with real paths or URLs) -->
+    <audio id="rain" src="sound/rain.mp3"></audio>
+    <audio id="waves" src="sound/waves.mp3"></audio>
+    <audio id="forest" src="sound/forest.mp3"></audio>
+    <audio id="white" src="sound/white.mp3"></audio>
+  </div>
+
+    <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+
+  <script>
+    /* ===== Breathing Exercise ===== */
+    let breathDur = 3, sessionLen = 180;
+    const prompts = [
+      { txt:"Inhale…", len:4000, scale:1.25 },
+      { txt:"Hold…", len:3000, scale:1.25 },
+      { txt:"Exhale…", len:5000, scale:0.82 },
+      { txt:"Hold…", len:3000, scale:0.82 }
+    ];
+    let bIdx=0, bRemaining=sessionLen*1000, timer=null;
+    function setBreath(mins){
+      breathDur=mins; sessionLen=mins*60; restartBreath();
+      document.querySelectorAll(".breath-btns button").forEach(b=>b.classList.remove('selected'));
+      document.getElementById('btn'+mins).classList.add('selected');
+    }
+    function restartBreath(){
+      clearTimeout(timer); bIdx=0; bRemaining=sessionLen*1000;
+      runCycle();
+    }
+    function runCycle(){
+      if(bRemaining<=0){ document.getElementById('breathPrompt').textContent="Well done! 🎉"; return;}
+      const p=prompts[bIdx];
+      document.getElementById('breathPrompt').textContent=p.txt;
+      document.getElementById('breathCircle').style.transform=`scale(${p.scale})`;
+      bRemaining-=p.len;
+      bIdx=(bIdx+1)%prompts.length;
+      timer=setTimeout(runCycle,p.len);
+    }
+    restartBreath();
+
+    /* ===== Grounding Steps ===== */
+    const steps=[
+      "👀 Name <b>5 things</b> you can see.",
+      "🤲 Name <b>4 things</b> you can touch.",
+      "👂 Name <b>3 things</b> you can hear.",
+      "👃 Name <b>2 things</b> you can smell.",
+      "👅 Name <b>1 thing</b> you can taste.",
+      "Great job! You’ve grounded yourself 🎉"
+    ];
+    let sIdx=0;
+    function nextStep(){
+      if(sIdx<steps.length){
+        document.getElementById('groundingSteps').innerHTML+=`<div class="ground-step">${steps[sIdx]}</div>`;
+        sIdx++;
+        if(sIdx===steps.length) document.getElementById('stepBtn').style.display="none";
+      }
+    }
+    nextStep();
+
+    /* ===== Distract Me ===== */
+    function calmDistract(){
+      const texts=[
+        "🌟 You’re stronger than you think!",
+        "💡 Fun fact: Bananas are berries, but strawberries are not.",
+        "😂 Time for a silly dance break!",
+        "✨ Reminder: You deserve peace."
+      ];
+      const images=["image/1.jpg","image/2.jpg","image/3.jpg","image/4.jpg"];
+      const isImage=Math.random()>0.5;
+      const out=document.getElementById("distractOut");
+      out.innerHTML="";
+      if(isImage){
+        const img=document.createElement("img");
+        img.src=images[Math.floor(Math.random()*images.length)];
+        img.alt="Distraction";
+        img.style.maxWidth="300px"; img.style.borderRadius="12px";
+        out.appendChild(img);
+      }else{
+        out.textContent=texts[Math.floor(Math.random()*texts.length)];
+      }
+      confetti({ particleCount:80, spread:70, origin:{y:0.6} });
+    }
+
+    /* ===== Sounds ===== */
+    let current=null;
+    function playSound(id){
+      const sel=document.getElementById(id);
+      if(current && current===sel && !sel.paused){ sel.pause(); current=null; }
+      else{
+        document.querySelectorAll("audio").forEach(a=>{a.pause();a.currentTime=0;a.loop=false;});
+        sel.loop=true; sel.play(); current=sel;
+      }
+    }
+  </script>
+</body>
+</html>
