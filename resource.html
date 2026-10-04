@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resource & Learning Hub - LumiBreeze</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+      background: linear-gradient(to right, #c9e4ff, #fdfbfb);
+      color: #333;
+      overflow-x: hidden;
+    }
+    header, nav { background:#5ab9ea; color: white; text-align: center; padding:2rem 0;}
+    header {animation:fadeInDown 1.2s ease;}
+    nav {display: flex; justify-content: center; gap:1.5rem;}
+    nav button {padding:0.6rem 1.2rem;border:none;background:#97d8fb;color:#333;border-radius:6px;cursor:pointer;margin:0.5rem .2rem;}
+    nav button.active {background:#ffc78e; color:#2a3459;}
+    h1 { font-size:2.3rem; margin-bottom:.35rem;}
+    h2, h3 {margin-top:1.5rem;}
+    .main {max-width:1100px;margin:2rem auto;background:#fff;border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);padding:2rem;}
+    section {display:none;}
+    section.active {display:block;animation:fadeInUp 0.9s;}
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-30px);} to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);}}
+    .resource-card {display:flex;gap:1.7rem;flex-wrap:wrap;justify-content:space-around;padding-bottom:2rem;}
+    .card {background:#f6faff;border-radius:1rem;box-shadow:0 4px 13px rgba(0,0,0,.07);
+      max-width:320px;padding:1.2rem .8rem;text-align:center;transition:transform 0.29s;}
+    .card:hover {transform:scale(1.045);}
+    .card img {width:90%;height:140px;object-fit:cover;border-radius:10px;}
+    .card h3 {margin-top:1.1rem;font-size:1.14rem;}
+    .card .save, .card .fav {border:none;background:none;cursor:pointer;color:#5ab9ea;font-size:1.2rem;}
+    .badge-strip, .streak-info {margin-top:1rem;}
+    .badge {display:inline-block;background:#ffdbb0;color:#222;border-radius:20px;padding:.35rem .85rem;margin:.2rem .33rem;font-size:1.03rem;}
+    .quiz {background:#fafdfe; border-radius:11px;box-shadow:0 2px 10px #bbcaf230;padding:1rem;margin-bottom:1.2rem;}
+    .community-thread {background:#f3eef8;border-radius:12px;padding:1rem;margin-bottom:1.2rem;}
+    .discussion, .exercise, .progress {margin-top:1rem;}
+    .exercise textarea {width:97%;height:2rem;margin-bottom:.8rem;}
+    .progress-bar {background:#c6e2ff;height:18px;border-radius:10px;margin-top:.5rem;position:relative;}
+    .progress-bar-inner {background:#5ab9ea;height:100%;border-radius:10px;}
+    .expert-section, .access-section {background:#eaf6ff;border-radius:10px;padding:1rem;margin-top:1.3rem;}
+    .hotlines-list {font-size:.98rem;margin-top:.6rem;}
+    .engage-link {color:#5ab9ea;text-decoration:underline;cursor:pointer;}
+    .lang-select {margin:.5rem 0;}
+    footer {text-align:center;padding:1.6rem 0;background:#f3f3f3;font-size:.92rem;margin-top:2rem;}
+    .hidden {display:none;}
+    /* For visually distinguishable links */
+    .card a, .category-links a, .quiz-link, .format-links a {
+      display: inline-block; margin: .45rem 0; color: #2a3459; background: #eaf6ff;
+      border-radius: 6px; padding: .17rem .63rem; text-decoration: none; font-size: .98rem;
+      border:1px solid #5ab9ea20; transition:.2s;
+    }
+    .card a:hover, .format-links a:hover {background:#97d8fde0;}
+
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 90px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 150px;
+      right: 30px;
+    }
+      footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 LumiBreeze Resource & Learning Hub</h1>
+    <p>Explore trusted articles, videos, podcasts, exercises, and more for mental wellness & recovery</p>
+  </header>
+  <nav>
+    <button onclick="showScreen('home')" class="active">Home</button>
+    <button onclick="showScreen('categories')">Categories</button>
+    <button onclick="showScreen('view')">View Content</button>
+    <button onclick="showScreen('quizzes')">Quizzes</button>
+    <button onclick="showScreen('progress')">Progress</button>
+    <button onclick="showScreen('community')">Community</button>
+    <button onclick="showScreen('expert')">Experts</button>
+    <button onclick="showScreen('accessibility')">Accessibility</button>
+    <button onclick="showScreen('settings')">Settings</button>
+  </nav>
+
+  <div class="main">
+    <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+    <!-- Home Screen -->
+    <section class="active" id="home">
+      <h2>🔥 Trending Topics & Playlists</h2>
+      <div class="resource-card">
+        <!-- Mindfulness -->
+        <div class="card">
+          <img src="https://assets.headspace.com/cms/uploads/media/image/4597/Meditation-Guide-Tile_1.png?auto=format&w=600&q=80" alt="Mindfulness Headspace" />
+          <h3>Mindfulness & Meditation</h3>
+          <p>Relax, focus & relieve stress.<br>
+            <a href="https://www.headspace.com/meditation/meditation-for-beginners" target="_blank">Beginner's Meditation</a>
+            <a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mindfulness/" target="_blank">NHS Mindfulness Self-Help</a>
+          </p>
+          <button class="save" onclick="saveResource('Mindfulness & Meditation')">📌 Save</button>
+          <button class="fav" onclick="favoriteResource('Mindfulness & Meditation')">⭐ Favorite</button>
+        </div>
+        <!-- Burnout Prevention -->
+        <div class="card">
+          <img src="https://images.ctfassets.net/hrltx12pl8hq/7dpIuhzFflhx26r7pMdEtu/42e06da2db82964e2bc9aa0c135ed55f/burnout.jpg?fit=fill&w=400&h=250" alt="Burnout Prevention" />
+          <h3>Burnout Prevention</h3>
+          <p>Recognize signs, recover energy.<br>
+            <a href="https://www.helpguide.org/articles/stress/burnout-prevention-and-treatment.htm" target="_blank">Burnout Guide</a>
+          </p>
+          <button class="save" onclick="saveResource('Burnout Prevention')">📌 Save</button>
+          <button class="fav" onclick="favoriteResource('Burnout Prevention')">⭐ Favorite</button>
+        </div>
+        <!-- Addiction Recovery -->
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=600&q=80" alt="Addiction Recovery" />
+          <h3>Addiction Recovery</h3>
+          <p>Journeys, support, podcasts.<br>
+            <a href="https://www.verywellmind.com/addiction-recovery-podcasts-4783102" target="_blank">Recovery Podcasts</a>
+          </p>
+          <button class="save" onclick="saveResource('Addiction Recovery')">📌 Save</button>
+          <button class="fav" onclick="favoriteResource('Addiction Recovery')">⭐ Favorite</button>
+        </div>
+        <!-- Depression -->
+        <div class="card">
+          <img src="https://www.wysa.com/images/site/depression-hero.png" alt="Dealing with Depression" />
+          <h3>Dealing with Depression</h3>
+          <p>Inspiring talks, expert tips.<br>
+            <a href="https://www.wysa.com/self-care" target="_blank">Wysa: Depression Toolkit</a>
+          </p>
+          <button class="save" onclick="saveResource('Dealing with Depression')">📌 Save</button>
+          <button class="fav" onclick="favoriteResource('Dealing with Depression')">⭐ Favorite</button>
+        </div>
+        <!-- Sleep Health -->
+        <div class="card">
+          <img src="https://images.ctfassets.net/hrltx12pl8hq/KH3w7Di9uM4kWvGMubZZb/9e8c0137de56c8bdf388208fd337956a/sleep.jpg?fit=fill&w=400&h=250" alt="Sleep Health" />
+          <h3>Sleep Wellness</h3>
+          <p>Improve sleep, rest better.<br>
+            <a href="https://www.sleepfoundation.org/" target="_blank">Sleep Foundation</a>
+          </p>
+          <button class="save" onclick="saveResource('Sleep Wellness')">📌 Save</button>
+          <button class="fav" onclick="favoriteResource('Sleep Wellness')">⭐ Favorite</button>
+        </div>
+      </div>
+      <div class="badge-strip">
+        <span class="badge">🎓 Learner</span>
+        <span class="badge">🧘 Mindfulness Explorer</span>
+        <span class="badge">🏅 Recovery Master</span>
+      </div>
+      <div class="streak-info">
+        <span>Learning streak: <strong id="learningStreak">0</strong> days</span>
+        <span>XP: <strong id="xpPoints">0</strong></span>
+      </div>
+      <div class="exercise">
+        <h3>Actionable Exercise: Reflection Prompt</h3>
+        <p>After reading, pause and answer: "What’s one idea I want to try today?"</p>
+        <textarea id="reflection"></textarea><br>
+        <button onclick="submitReflection()">Save Reflection</button>
+      </div>
+    </section>
+    
+
+    <!-- Category Screen -->
+    <section id="categories">
+      <h2>Categories & Filters</h2>
+      <select onchange="filterCategory(this.value)">
+        <option value="all">All</option>
+        <option value="mindfulness">Mindfulness</option>
+        <option value="stress">Stress & Burnout</option>
+        <option value="depression">Depression</option>
+        <option value="addiction">Addiction Recovery</option>
+        <option value="sleep">Sleep</option>
+        <option value="relationships">Relationships</option>
+      </select>
+      <div class="resource-card category-links" id="categoryList"></div>
+      <h3>Format Filter</h3>
+      <div class="format-links">
+        <a href="https://www.youtube.com/results?search_query=mindfulness+meditation" target="_blank">Mindfulness Videos</a>
+        <a href="https://www.headspace.com/articles" target="_blank">Mindfulness Blogs</a>
+        <a href="https://podcasts.apple.com/us/genre/podcasts/health-fitness/mental-health/id1516" target="_blank">Mental Health Podcasts</a>
+        <a href="https://www.sleepfoundation.org/infographics" target="_blank">Sleep Infographics</a>
+        <a href="https://www.wellandgood.com/ebooks/" target="_blank">Wellness E-books</a>
+      </div>
+    </section>
+
+    <!-- Content View Screen -->
+    <section id="view">
+      <h2>View Resource</h2>
+      <div id="contentView">
+        <h3 id="contentTitle">Select content from Home or Categories</h3>
+        <div id="contentBody"></div>
+        <div class="exercise">
+          <h4>Guided Worksheet</h4>
+          <textarea placeholder="Your insights here..."></textarea>
+          <button onclick="submitWorksheet()">Submit</button>
+        </div>
+        <div class="discussion">
+          <h4>Comments & Discussion</h4>
+          <textarea placeholder="Write your comment..." id="commentInput"></textarea>
+          <button onclick="submitComment()">Send</button>
+          <div id="comments"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quiz Section with links -->
+    <section id="quizzes">
+      <h2>Interactive Quizzes</h2>
+      <div class="quiz">
+        <h3>Are you stressed or burnt out?</h3>
+        <a class="quiz-link" href="https://www.mindtools.com/page11.html" target="_blank">Stress Quiz</a>
+        <button onclick="startQuiz('stress')">Mark as Completed</button>
+      </div>
+      <div class="quiz">
+        <h3>Mood Check-In</h3>
+        <a class="quiz-link" href="https://www.verywellmind.com/depression-quiz-3788700" target="_blank">Depression Self-check</a>
+        <button onclick="startQuiz('mood')">Mark as Completed</button>
+      </div>
+      <div class="quiz">
+        <h3>Mindfulness Self-Assessment</h3>
+        <a class="quiz-link" href="https://www.mindful.org/quiz-how-mindful-are-you/" target="_blank">Mindfulness Quiz</a>
+        <button onclick="startQuiz('mindfulness')">Mark as Completed</button>
+      </div>
+      <div id="quizArea"></div>
+    </section>
+
+    <!-- Progress Dashboard -->
+    <section id="progress">
+      <h2>Your Learning Progress</h2>
+      <div class="progress">
+        <p>Articles read: <span id="articlesRead">0</span></p>
+        <p>Videos watched: <span id="videosWatched">0</span></p>
+        <p>Podcasts listened: <span id="podcastsListened">0</span></p>
+        <p>Quizzes completed: <span id="quizzesDone">0</span></p>
+        <div class="progress-bar"><div class="progress-bar-inner" id="progressBarInner" style="width:0%"></div></div>
+      </div>
+      <div>
+        <h3>Milestone Unlock</h3>
+        <div id="milestoneUnlock"></div>
+      </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community">
+      <h2>Community Stories & Discussion</h2>
+      <div class="community-thread">
+        <h3>Share Your Journey</h3>
+        <textarea id="userStory" placeholder="Share your wellness story..."></textarea>
+        <button onclick="submitStory()">Post Story</button>
+        <div id="storyList"></div>
+      </div>
+      <div>
+        <h3>Peer Recommended Content</h3>
+        <p>Most helpful this week:</p>
+        <ul id="peerRecommended">
+          <li><a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mindfulness/" target="_blank">10-minute Daily Mindfulness</a> (upvotes: 14)</li>
+          <li><a href="https://www.verywellmind.com/best-mental-health-podcasts-4843951" target="_blank">Podcast: How I Quit Drinking</a> (upvotes: 10)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Expert Section -->
+    <section id="expert">
+      <h2>Expert & Professional Hub</h2>
+      <div class="expert-section">
+        <h3>Read Verified Articles</h3>
+        <ul>
+          <li><a href="https://www.psychiatry.org/patients-families/cognitive-behavioral-therapy" target="_blank">What is Cognitive Behavioral Therapy?</a></li>
+          <li><a href="https://www.mindbodygreen.com/0-28197/7-habits-every-successful-person-built-to-last.html" target="_blank">Building Recovery Habits</a></li>
+        </ul>
+        <h3>Live Webinars & Q&A</h3>
+        <p>Upcoming: <a href="https://www.samhsa.gov/events" target="_blank">Webinar: Managing Relapse & Motivation</a> (next Thursday, 5pm IST)</p>
+      </div>
+      <div class="hotlines-list">
+        <h4>Support Lines</h4>
+        <p>India: <a href="https://icallhelpline.org" target="_blank">iCall – +91 9152987821</a></p>
+        <p>USA: <a href="https://www.samhsa.gov/find-help/national-helpline" target="_blank">SAMHSA – 1-800-662-4357</a></p>
+        <p>UK: <a href="https://www.nhs.uk/live-well/addiction-support/drinkline/" target="_blank">Drinkline – 0300 123 1110</a></p>
+      </div>
+    </section>
+
+    <!-- Accessibility Section -->
+    <section id="accessibility">
+      <h2>Accessibility & Usability</h2>
+      <div class="access-section">
+        <h3>Offline Reading Mode</h3>
+        <button onclick="enableOffline()">Enable</button>
+        <h3>Audio Articles</h3>
+        <button onclick="playAudioContent()">Play Audio</button>
+        <h3>Multi-Language Support</h3>
+        <select class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="es">Spanish</option>
+        </select>
+        <h3>Content Format Filter</h3>
+        <!-- Already included above -->
+      </div>
+    </section>
+
+    <!-- Settings/Personalize -->
+    <section id="settings">
+      <h2>Personalize & Integration</h2>
+      <div>
+        <label>Connect Recovery Journey:
+          <select onchange="linkRecovery(this.value)">
+            <option value="stress">Stress log</option>
+            <option value="depression">Depression mood</option>
+            <option value="cravings">Recent cravings</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="digestNotify"> Daily/Weekly Digest</label>
+        <label><input type="checkbox" id="challengesNotify"> New Challenge Alert</label>
+        <label><input type="checkbox" id="xpNotify"> XP & Badges Notification</label>
+      </div>
+    </section>
+  </div>
+ <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+
+<script>
+  // --- Navigation ---
+  function showScreen(id) {
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b=>{
+      if(b.getAttribute('onclick').includes(id)) b.classList.add('active');
+    });
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // Show categories default if selected
+    if(id === 'categories') filterCategory('all');
+  }
+
+  // --- State ---
+  let savedResources = [];
+  let favoriteResources = [];
+  let articlesRead = 0, videosWatched = 0, podcastsListened = 0, quizzesDone = 0;
+  let learningStreak = 0, xpPoints = 0, milestones = [], reflections = [], worksheetAnswers = [];
+  let userComments = [], userStories = [];
+  let progressPct = 0;
+
+  // --- Sample dynamic functions ---
+  function saveResource(name) {
+    if(!savedResources.includes(name)) savedResources.push(name);
+    alert(`Saved: ${name}`);
+  }
+  function favoriteResource(name) {
+    if(!favoriteResources.includes(name)) favoriteResources.push(name);
+    alert(`Favorited: ${name}`);
+  }
+  function submitReflection() {
+    const val = document.getElementById("reflection").value;
+    if(val) {reflections.push(val); document.getElementById("reflection").value=''; xpPoints+=2; calcProgress();}
+  }
+  function submitWorksheet() {
+    xpPoints+=3; calcProgress();
+    alert("Worksheet submitted!");
+  }
+  function submitComment() {
+    const val = document.getElementById("commentInput").value;
+    if(val) {userComments.push(val); document.getElementById("commentInput").value=''; renderComments();}
+  }
+  function renderComments() {
+    document.getElementById("comments").innerHTML = userComments.map(c=>`<div>${c}</div>`).join("");
+  }
+  function submitStory() {
+    const val = document.getElementById("userStory").value;
+    if(val){userStories.push(val); document.getElementById("userStory").value=''; renderStories();}
+  }
+  function renderStories() {
+    document.getElementById("storyList").innerHTML = userStories.map(s=>`<div>${s}</div>`).join("");
+  }
+  function startQuiz(topic) {
+    quizzesDone++; xpPoints+=5; learningStreak++; calcProgress();
+    document.getElementById("quizArea").innerHTML = `<p>Quiz completed for "${topic}"! XP awarded.</p>`;
+    document.getElementById("quizzesDone").innerText = quizzesDone;
+  }
+  function filterCategory(cat) {
+    let el = document.getElementById("categoryList");
+    let data = {
+      "mindfulness": {
+        img: "https://assets.headspace.com/cms/uploads/media/image/4597/Meditation-Guide-Tile_1.png?auto=format&w=600&q=80",
+        title: "Mindfulness",
+        links: [
+          {text:"Beginner's Meditation", url:"https://www.headspace.com/meditation/meditation-for-beginners"},
+          {text:"NHS Mindfulness Self-Help", url:"https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/mindfulness/"}
+        ]
+      },
+      "stress": {
+        img:"https://images.ctfassets.net/hrltx12pl8hq/7dpIuhzFflhx26r7pMdEtu/42e06da2db82964e2bc9aa0c135ed55f/burnout.jpg?fit=fill&w=400&h=250",
+        title:"Stress & Burnout",
+        links: [
+          {text:"Burnout Guide",url:"https://www.helpguide.org/articles/stress/burnout-prevention-and-treatment.htm"},
+          {text:"Stress Quiz",url:"https://www.mindtools.com/page11.html"}
+        ]
+      },
+      "depression": {
+        img:"https://www.wysa.com/images/site/depression-hero.png",
+        title:"Depression",
+        links: [
+          {text:"Wysa: Depression Toolkit",url:"https://www.wysa.com/self-care"},
+          {text:"Depression Self-check",url:"https://www.verywellmind.com/depression-quiz-3788700"}
+        ]
+      },
+      "addiction": {
+        img:"https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=600&q=80",
+        title:"Addiction Recovery",
+        links: [
+          {text:"Recovery Podcasts",url:"https://www.verywellmind.com/addiction-recovery-podcasts-4783102"}
+        ]
+      },
+      "sleep": {
+        img:"https://images.ctfassets.net/hrltx12pl8hq/KH3w7Di9uM4kWvGMubZZb/9e8c0137de56c8bdf388208fd337956a/sleep.jpg?fit=fill&w=400&h=250",
+        title:"Sleep",
+        links: [
+          {text:"Sleep Foundation",url:"https://www.sleepfoundation.org/"},
+          {text:"Sleep Infographics",url:"https://www.sleepfoundation.org/infographics"}
+        ]
+      },
+      "relationships": {
+        img:"https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80",
+        title:"Relationships",
+        links: [
+          {text:"Relationship Advice", url:"https://www.headspace.com/relationships"}
+        ]
+      }
+    };
+    if(cat === "all") {
+      el.innerHTML = Object.keys(data).map(k=>{
+        let c = data[k];
+        return `<div class="card">
+            <img src="${c.img}" alt="${c.title}" />
+            <h3>${c.title}</h3>
+            <div>${c.links.map(l=>`<a href="${l.url}" target="_blank">${l.text}</a>`).join("<br>")}</div>
+          </div>`;
+      }).join("");
+    } else if(data[cat]) {
+      let c = data[cat];
+      el.innerHTML = `<div class="card">
+        <img src="${c.img}" alt="${c.title}" />
+        <h3>${c.title}</h3>
+        <div>${c.links.map(l=>`<a href="${l.url}" target="_blank">${l.text}</a>`).join("<br>")}</div>
+      </div>`;
+    } else {
+      el.innerHTML = `<div>No resources found for "${cat}"</div>`;
+    }
+  }
+  function filterFormat(fmt) {
+    alert(`Filtered by: ${fmt}`);
+  }
+  function enableOffline() {alert("Offline mode enabled for reading!");}
+  function playAudioContent() {alert("Audio article playback started!");}
+  function changeLanguage(lang) {alert(`Language set to ${lang}`);}
+  function linkRecovery(log) {alert(`Linked Resource Hub to ${log}`);}
+  function calcProgress() {
+    articlesRead = reflections.length;
+    videosWatched = Math.floor(xpPoints/5);
+    podcastsListened = Math.floor(xpPoints/8);
+    let total = articlesRead+videosWatched+podcastsListened+quizzesDone;
+    document.getElementById("articlesRead").innerText = articlesRead;
+    document.getElementById("videosWatched").innerText = videosWatched;
+    document.getElementById("podcastsListened").innerText = podcastsListened;
+    progressPct = Math.min(100, total*12);
+    document.getElementById("progressBarInner").style.width = progressPct+"%";
+    document.getElementById("learningStreak").innerText = learningStreak;
+    document.getElementById("xpPoints").innerText = xpPoints;
+    if(progressPct>=30 && !milestones.includes("30pct")) {
+      document.getElementById("milestoneUnlock").innerText = "Unlocked: Advanced Content – Staying Strong";
+      milestones.push("30pct");
+    }
+  }
+  window.onload = function(){calcProgress();}
+</script>
+</body>
+</html>
