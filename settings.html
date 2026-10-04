@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LumiBreeze – Settings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent: #00bcd4; --primary: #004d40; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(90deg, #fffde4 0%, #d0f4fb 100%);
+      font-family: 'Outfit', sans-serif; color: var(--primary);
+      display: flex; justify-content: center; align-items: flex-start;
+    }
+    .wrap { width: min(680px, 94vw); margin: 2.4rem 0 3rem; }
+    h1 { font-weight: 900; letter-spacing: .03em; color: #006064; margin: 0 0 .2rem; }
+    .sub { color: #0097a7; margin: 0 0 1.4rem; }
+    .card {
+      background: #fff; border-radius: 18px; padding: 1.2rem 1.4rem;
+      box-shadow: 0 5px 26px rgba(71,226,220,.14); margin-bottom: 1.1rem;
+    }
+    .card h2 { margin: 0 0 .5rem; font-size: 1.15rem; color: #00695c; }
+    .card p { margin: .35rem 0; line-height: 1.5; font-size: .95rem; }
+    .row { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; margin-top: .7rem; }
+    button, .filebtn {
+      font: inherit; cursor: pointer; border: none; border-radius: 11px;
+      padding: .55em 1.1em; background: linear-gradient(120deg,#e0f7fa 70%,#fffde4 100%);
+      color: #00838f; border: 1.2px solid #00bcd435; transition: background .15s;
+    }
+    button:hover, .filebtn:hover { background: #c1f7f8; }
+    button.danger { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+    button.danger:hover { background: #ffcdd2; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    input[type="password"], input[type="file"] {
+      font: inherit; padding: .5em .8em; border-radius: 11px; border: 1px solid #b2ebf2;
+      background: #f8fdfd; color: var(--primary);
+    }
+    .status { font-weight: 600; }
+    .status.on { color: #2e7d32; }
+    .status.off { color: #607d8b; }
+    .status.lock { color: #ef6c00; }
+    .note { font-size: .85rem; color: #546e7a; }
+    a.home { color: #00838f; font-weight: 600; text-decoration: none; }
+    a.home:hover { text-decoration: underline; }
+    #msg { min-height: 1.4em; margin-top: .6rem; font-size: .92rem; color: #00695c; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1><i class="fas fa-cog"></i> Settings</h1>
+  <p class="sub">Privacy, sync and data controls. Everything lives in this browser — nothing is uploaded.</p>
+
+  <div class="card">
+    <h2><i class="fas fa-shield-alt"></i> Zero-knowledge sync vault</h2>
+    <p>Your pet, journal, habits and moods are stored on this device. Turn the vault on and the
+       stored blob is sealed with AES-GCM-256 using a key derived from your passphrase
+       (PBKDF2-SHA256, 210k iterations). The passphrase never leaves this device, so the
+       exported file is unreadable without it.</p>
+    <p>Status: <span id="vault-status" class="status off">…</span></p>
+    <div class="row" id="vault-off-row">
+      <input type="password" id="pass-new" placeholder="Choose a passphrase" autocomplete="new-password" />
+      <input type="password" id="pass-confirm" placeholder="Repeat it" autocomplete="new-password" />
+      <button id="btn-enable">Enable vault</button>
+    </div>
+    <div class="row" id="vault-lock-row" hidden>
+      <input type="password" id="pass-unlock" placeholder="Passphrase" autocomplete="current-password" />
+      <button id="btn-unlock">Unlock</button>
+    </div>
+    <div class="row" id="vault-on-row" hidden>
+      <button id="btn-export">Export vault file</button>
+      <button id="btn-disable" class="danger">Turn off &amp; delete vault</button>
+    </div>
+    <div class="row">
+      <input type="file" id="import-file" accept=".json,application/json" />
+      <input type="password" id="pass-import" placeholder="Passphrase (if encrypted)" autocomplete="current-password" />
+      <button id="btn-import">Import vault file</button>
+    </div>
+    <p class="note">Importing replaces the progress on this device with the file's contents.</p>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-brain"></i> On-device memory</h2>
+    <p>LumiBot embeds your journal entries and chat turns into local semantic vectors
+       (IndexedDB) so it can recall them later. No text ever leaves the browser.</p>
+    <p>Memories stored: <b id="mem-count">…</b></p>
+    <div class="row">
+      <button id="btn-wipe-mem" class="danger">Erase all memories</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><i class="fas fa-trash-alt"></i> Reset</h2>
+    <p>Clears pet progress, journal, habits, moods, DDA history and the vault from this browser.</p>
+    <div class="row">
+      <button id="btn-reset" class="danger">Reset everything</button>
+    </div>
+  </div>
+
+  <p><a class="home" href="home.html"><i class="fas fa-arrow-left"></i> Back to dashboard</a></p>
+  <div id="msg" role="status" aria-live="polite"></div>
+</div>
+
+<script type="module">
+  import {
+    ready, getState, setState, persist,
+    enableEncryption, disableEncryption, isEncryptionEnabled, isLocked,
+    unlock, exportVault, importVault,
+  } from './js/core/store.js';
+  import * as memory from './js/core/vectors.js';
+
+  const $ = (id) => document.getElementById(id);
+  const msg = (t) => { $('msg').textContent = t; };
+
+  function renderStatus() {
+    const el = $('vault-status');
+    if (!isEncryptionEnabled()) {
+      el.textContent = 'Off — progress stored as plain local JSON';
+      el.className = 'status off';
+      $('vault-off-row').hidden = false;
+      $('vault-lock-row').hidden = true;
+      $('vault-on-row').hidden = true;
+    } else if (isLocked()) {
+      el.textContent = 'On — locked on this session';
+      el.className = 'status lock';
+      $('vault-off-row').hidden = true;
+      $('vault-lock-row').hidden = false;
+      $('vault-on-row').hidden = true;
+    } else {
+      el.textContent = 'On — unlocked, changes are sealed automatically';
+      el.className = 'status on';
+      $('vault-off-row').hidden = true;
+      $('vault-lock-row').hidden = true;
+      $('vault-on-row').hidden = false;
+    }
+  }
+
+  async function renderMemory() {
+    try { $('mem-count').textContent = await memory.count(); }
+    catch { $('mem-count').textContent = 'unavailable'; }
+  }
+
+  $('btn-enable').onclick = async () => {
+    const a = $('pass-new').value, b = $('pass-confirm').value;
+    if (a.length < 8) return msg('Pick a passphrase of at least 8 characters.');
+    if (a !== b) return msg('The two passphrases do not match.');
+    try {
+      await enableEncryption(a);
+      $('pass-new').value = $('pass-confirm').value = '';
+      renderStatus();
+      msg('Vault enabled — your progress is now encrypted at rest.');
+    } catch (e) { msg(e.message); }
+  };
+
+  $('btn-unlock').onclick = async () => {
+    const ok = await unlock($('pass-unlock').value);
+    if (!ok) return msg('Wrong passphrase — nothing was decrypted.');
+    $('pass-unlock').value = '';
+    renderStatus();
+    msg('Unlocked. Your progress is loaded.');
+  };
+
+  $('btn-disable').onclick = () => {
+    if (!confirm('Turn off the vault and delete the encrypted blob? Progress continues in plain local storage.')) return;
+    disableEncryption();
+    renderStatus();
+    msg('Vault removed.');
+  };
+
+  $('btn-export').onclick = () => {
+    const envelope = exportVault();
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = envelope.format === 'lbvault1' ? 'lumibreeze-vault.json' : 'lumibreeze-progress.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    msg('Vault file downloaded. Keep it safe — without your passphrase it is just noise.');
+  };
+
+  $('btn-import').onclick = async () => {
+    const file = $('import-file').files[0];
+    if (!file) return msg('Choose a vault file first.');
+    try {
+      const envelope = JSON.parse(await file.text());
+      const imported = await importVault(envelope, $('pass-import').value || null);
+      setState(s => {
+        for (const k of Object.keys(imported)) s[k] = imported[k];
+      }, 'import');
+      renderStatus();
+      msg('Import complete — welcome back.');
+    } catch (e) {
+      msg('Import failed: ' + (e.message || 'unreadable file or wrong passphrase'));
+    }
+  };
+
+  $('btn-wipe-mem').onclick = async () => {
+    if (!confirm('Erase every on-device memory LumiBot has formed?')) return;
+    await memory.wipeMemory();
+    renderMemory();
+    msg('Memories erased.');
+  };
+
+  $('btn-reset').onclick = async () => {
+    if (!confirm('Reset ALL LumiBreeze progress on this browser? This cannot be undone.')) return;
+    localStorage.removeItem('lb_state_v2');
+    localStorage.removeItem('lb_vault_v2');
+    localStorage.removeItem('lb_vault_v2_verifier');
+    await memory.wipeMemory();
+    location.href = 'home.html';
+  };
+
+  await ready;
+  renderStatus();
+  renderMemory();
+</script>
+</body>
+</html>
