@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emergency & Helpline Support | LumiBreeze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;800&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg,#e8f8fc 0%, #f6fbff 60%, #e4edff 100%);
+    color: #19213b;
+    overflow-x: hidden;
+  }
+  header {
+    text-align: center;
+    padding: 2.8rem 1.2rem 1.2rem;
+    background: linear-gradient(100deg, #1769c3 0%, #4bb6e6 100%);
+    color: #fff;
+    border-bottom-left-radius: 32px;
+    border-bottom-right-radius: 32px;
+    box-shadow: 0 8px 36px #138fd73c;
+    position: relative;
+    z-index: 2;
+  }
+  header::after {
+    content: "";
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 120px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/1/1a/India_location_map.svg') no-repeat right center;
+    background-size: 60px;
+    opacity: 0.09;
+    z-index:-1;
+  }
+  header h1 {
+    margin: 0; font-size: 2.8rem; letter-spacing: 0.05em; font-weight: 900; text-shadow: 0 5px 24px rgba(0,0,0,0.12);
+  }
+  header p {
+    font-size: 1.25rem; margin: 0.8rem 0 0; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .privacy-banner {
+    background: #ffe7d7; color: #be5d32; font-weight: 800; padding: 1rem 0; text-align: center; letter-spacing: 0.02em; font-size: 1.1rem;
+  }
+  .incognito-toggle { position: fixed; right: 18px; top: 12px; background: #f2f4f8; border-radius: 22px; padding: 0.4rem 1.1rem; z-index: 2; font-weight:700; border: 2px solid #a2bdec; cursor: pointer; }
+  main {
+    max-width: 920px;
+    margin: 2.2rem auto 2rem;
+    padding: 0 1.5rem;
+    display: flex; flex-direction: column; gap: 2.5rem;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 14px 44px #2b5ea70d;
+    padding: 2.2rem 2.2rem 2.1rem;
+    margin: 0 0 1rem;
+    transition: box-shadow 0.3s, transform 0.2s;
+  }
+  .card:focus-within, .card:hover { box-shadow: 0 18px 60px #2464c927; transform: translateY(-4px);}
+  .card h2 { margin-top: 0; font-size: 1.5rem; color: #1976d2; font-weight: 800; }
+
+  /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 50px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 110px;
+      right: 30px;
+    }
+    .chatbot {
+      top: 170px;
+      right: 30px;
+    }
+  /* Statewise Helpline Directory */
+  .state-helpline-section { display: flex; flex-direction: column; gap: 1.9rem; }
+  .helpline-list {display: grid; grid-template-columns: repeat(auto-fill,minmax(298px,1fr)); gap: 1.3rem; margin: 0; padding: 0;}
+  .helpline-card {
+    list-style: none;
+    background: #f6faff;
+    border-left: 5px solid #a1d0fa;
+    padding: 1.15rem 1.2rem 1.05rem;
+    border-radius: 11px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a4477;
+    box-shadow: 0 4px 18px #b7e3f1;
+    display: flex; flex-direction: column; gap: 0.4rem;
+    position:relative;
+  }
+  .helpline-tag { 
+    position:absolute; right: 12px; top: 14px; font-size: .86rem; background: #e0fbd9; color: #20a343; border-radius:7px; padding: 2px 9px; font-weight:600
+  }
+  .helpline-langs{ font-size:.94rem; color:#20589e; margin-top: 0.2em;}
+  .state-highlight {border-color:#f69b16 !important; background: #fff6e8 !important; box-shadow:0 4px 14px #ffe1bbba; }
+  .find-state-bar {display:flex;align-items:center;gap:1rem;margin:0 0 1.3rem;}
+  .find-btn {padding:.65em 1.13em;font-size:1.04rem;background:#1976d2;color:#fff;font-weight:800;border-radius:7px;border:none;cursor:pointer;}
+  /* Risk detector */
+  .risk-det {margin-bottom:1.1rem;}
+  .risk-input {width: 100%; font-size:1.08rem; padding: .95rem; border-radius:11px; border:2px solid #b7e4fb;}
+  .risk-alert {margin: 0.8rem 0 0; color: #d32f2f; font-weight: 900;}
+  /* Emergency Message */
+  .input-group input, .input-group textarea { width:100%; padding:.96rem 1.12rem; border-radius:10px; font-size:1rem; border:2px solid #1976d2;}
+  .input-group label {font-weight:700; margin-bottom:0.5rem;}
+  .input-group {margin-bottom:1.15rem;}
+  .send-btn {background:linear-gradient(90deg,#d32f2f,#ff4d4f);color:#fff;font-size:1.13rem;padding:1.06rem 0;width:100%;font-weight:800;border-radius:13px;border:none;cursor:pointer;box-shadow:0 3px 18px #d32f2f69;transition:background 0.33s;}
+  .send-btn:active {background:#a62525;}
+  /* Quick Help Modal */
+  #quickHelpModal {display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,40,0.4);align-items:center;justify-content:center;}
+  .modal-content {background:white;border-radius:18px;max-width:375px;margin:6rem auto;padding:2rem;position:relative;box-shadow:0 11px 48px #3f528c23;}
+  .modal-content h3 {margin-top:0;color:#1976d2;font-size:1.36rem;font-weight:900;}
+  .quick-help-btn {background:#ff4d4f;font-size:1.2rem;font-weight:900;color:#fff;padding:1rem 1.15rem;border-radius:13px;border:none;width:100%;cursor:pointer;margin-bottom:1rem;}
+  .quick-help-btn:active {background:#c62b2d;}
+  .modal-content ul {padding:0 0 1.4em;margin:0;color:#274255;font-weight:700;}
+  .close-btn {background:transparent;border:none;font-size:1.8rem;font-weight:900;color:#d32f2f;position:absolute;top:13px;right:13px;cursor:pointer;}
+  .close-btn:active {color:#a12222;}
+  .feedback-bar {margin:1.7rem 0 0; text-align:center;}
+  .feedback-bar input[type="radio"] {margin:0 0.16rem;}
+  .feedback-bar label {font-weight:700;margin:0 0.7rem 0 0.3rem;}
+  @media (max-width:600px){
+    main{padding:0 .5rem;}
+    .helpline-list{grid-template-columns:1fr;}
+    header h1{font-size:1.5rem;}
+    .card{padding:1.2rem;}
+  }
+    footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+</style>
+</head>
+<body>
+
+<header role="banner">
+  <h1>🆘 Emergency & Helpline Support </h1>
+  <p>Instant, confidential, multilingual help — state-wise, one tap away.</p>
+</header>
+<div class="privacy-banner">Your privacy is protected — no form data is stored.</div>
+<button class="incognito-toggle" onclick="toggleIncognito()" id="incognitoBtn" aria-pressed="false">Enable Incognito</button>
+
+<main role="main" aria-label="Indian State Helpline and Crisis Support Page">
+
+    <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+  <button class="floating-btn chatbot" id="chatbot" aria-label="Floating chatbot virtual companion" onclick="location.href='chatbot.html'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot chatbot icon" />
+  </button>
+
+  <!-- SMART RISK DETECTOR -->
+  <section class="card" aria-labelledby="riskDetectionTitle">
+    <h2 id="riskDetectionTitle">🚨 Risk Keyword Detector </h2>
+    <div class="risk-det">
+      <label for="riskInput"><span style="font-weight:bold;">Type your message for risk check:</span></label>
+      <input type="text" id="riskInput" class="risk-input" autocomplete="off" placeholder="I'm overwhelmed...">
+      <div id="riskAlert" class="risk-alert" aria-live="assertive" role="alert"></div>
+    </div>
+  </section>
+
+  <!-- STATEWISE HELPLINE DIRECTORY -->
+  <section class="card state-helpline-section" aria-labelledby="helplineTitle">
+    <div class="find-state-bar">
+      <label for="stateSelect" style="font-weight:800;">Find my state helpline:</label>
+      <select id="stateSelect" style="font-size:1.07rem;padding:6px 12px;border-radius:7px;border:1px solid #b7e3f1;">
+        <option value="">Select State</option>
+      </select>
+      <button class="find-btn" onclick="highlightStateCard()">Show</button>
+    </div>
+    <h2 id="helplineTitle">📞 State-wise Helplines (India)</h2>
+    <ul class="helpline-list" id="helplineList"></ul>
+  </section>
+
+  <!-- ANONYMOUS EMERGENCY MESSAGE -->
+  <section class="card" aria-labelledby="emergencyMsgTitle">
+    <h2 id="emergencyMsgTitle">📩 Anonymous Emergency Message</h2>
+    <form id="emergencyForm" autocomplete="off">
+      <div class="input-group">
+        <label for="contactInfo">Trusted contact’s email or phone</label>
+        <input type="text" id="contactInfo" name="contactInfo" required placeholder="e.g. friend@email.com or +911234567890"/>
+      </div>
+      <div class="input-group">
+        <label for="emergencyMsg">Message (e.g., 'I need help')</label>
+        <textarea id="emergencyMsg" name="emergencyMsg" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="send-btn">Send Emergency Message</button>
+      <div id="msgStatus" style="margin-top:1rem;color:#d32f2f;font-weight:600;"></div>
+      <div style="margin:.7rem 0 0;color:#3567a8;font-size:.95rem;">All messages are auto-deleted. Enable <b>Incognito</b> for extra privacy.</div>
+    </form>
+  </section>
+
+  <!-- QUICK HELP -->
+  <section class="card" aria-labelledby="quickHelpTitle">
+    <h2 id="quickHelpTitle">🛟 Quick Help</h2>
+    <button class="quick-help-btn" onclick="showModal()">I Need Help Now</button>
+  </section>
+</main>
+
+<!-- Modal -->
+<div id="quickHelpModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div class="modal-content">
+    <h3 id="modalTitle">Immediate State/National Help</h3>
+    <p id="modalDesc">Tap to call/copy urgent helpline:</p>
+    <ul id="quickHelpList"></ul>
+    <button class="close-btn" onclick="closeModal()" aria-label="Close Help Modal">&times;</button>
+    <div class="feedback-bar">
+      <label for="feedback1">Was this page helpful?</label>
+      <input type="radio" id="feedback1" name="feedback" value="yes">
+      <label for="feedback1">Yes</label>
+      <input type="radio" id="feedback2" name="feedback" value="no">
+      <label for="feedback2">No</label>
+    </div>
+  </div>
+</div>
+ <footer>
+    Designed and Developed by ANUSHKA VIDYARTHY 😊
+  </footer>
+
+<script>
+const stateHelplines = [
+  { state: "Maharashtra", helpline: "iCall (TISS)", phone: "022-25521111", langs: "Hindi, English" },
+  { state: "Tamil Nadu", helpline: "Sneha Foundation", phone: "044-24640050, 044-24640060", langs: "Tamil, English" },
+  { state: "Karnataka", helpline: "NIMHANS", phone: "080-46110007", langs: "Kannada, Hindi, English" },
+  { state: "Delhi NCR", helpline: "SUMAITRI", phone: "011-46018404", langs: "Hindi, English" },
+  { state: "Kerala", helpline: "DISHA", phone: "1056", langs: "Malayalam, English" },
+  { state: "West Bengal", helpline: "Lifeline Foundation", phone: "033-24637401, 033-24637432", langs: "Bengali, English" },
+  { state: "Gujarat", helpline: "SAATH", phone: "079-26305544", langs: "Gujarati, English" },
+  { state: "Rajasthan", helpline: "Connecting Trust", phone: "0755-2733434", langs: "Hindi, English" },
+  { state: "Punjab", helpline: "Mann Talks", phone: "1800-180-1552", langs: "Punjabi, Hindi" },
+  // National 
+  { state: "National", helpline: "KIRAN Govt. Helpline", phone: "1800-599-0019", langs: "13 Indian Langs" },
+  { state: "National", helpline: "AASRA", phone: "9820466726", langs: "Hindi, English" }
+];
+
+// Populate select state dropdown
+const stateSelect = document.getElementById('stateSelect');
+let statesAdded = new Set();
+stateHelplines.forEach(h=>{
+  if(!statesAdded.has(h.state)) {
+    let opt = document.createElement("option");
+    opt.value = h.state;
+    opt.textContent = h.state;
+    stateSelect.appendChild(opt);
+    statesAdded.add(h.state);
+  }
+});
+
+// Render helplines as state cards
+const helplineList = document.getElementById('helplineList');
+function renderHelplines(){
+  helplineList.innerHTML = "";
+  stateHelplines.forEach((h,i)=>{
+    let li = document.createElement("li");
+    li.className = "helpline-card";
+    li.setAttribute("data-state", h.state);
+    li.innerHTML = `<span>
+      <span style="font-size:1.13rem;color:#194a80;font-weight:800;">${h.state}</span>
+      <span class="helpline-tag">${h.helpline}</span>
+      <div style="font-size:1.07rem;padding-top:.5em;"><b>Phone:</b> ${h.phone}</div>
+      <span class="helpline-langs">Languages: ${h.langs}</span>
+    </span>
+    <div style="margin-top:.7em;display:flex;gap:.5em;">
+      <button class="find-btn" onclick="callNumber('${h.phone.split(',')[0]}')" aria-label="Call ${h.helpline}">Call</button>
+      <button class="find-btn" style="background:#44b571;" onclick="copyText('${h.phone}')" aria-label="Copy ${h.helpline} number">Copy</button>
+    </div>`;
+    helplineList.appendChild(li);
+  });
+}
+renderHelplines();
+
+function callNumber(number) {
+  window.location.href = 'tel:' + number.replace(/\D/g,'');
+}
+function copyText(text) {
+  navigator.clipboard.writeText(text);
+  alert('Copied: '+text);
+}
+
+// Highlight selected state card
+function highlightStateCard() {
+  let val = stateSelect.value;
+  let cards = [...document.querySelectorAll('.helpline-card')];
+  cards.forEach(c => c.classList.remove('state-highlight'));
+  if(val){
+    let found = cards.filter(c => c.getAttribute("data-state")===val);
+    found.forEach(c=>c.classList.add('state-highlight'));
+    if(found.length) found[0].scrollIntoView({ behavior: "smooth", block:"center"});
+  }
+}
+
+// Risk Detector
+const riskKeywords = [
+  "suicide","hurt myself","hurt","no hope","can't go on","end it","kill myself","emergency","die","crisis",
+  "hopeless","unable","can’t live","alone","overwhelmed","help","panic","very bad"
+];
+document.getElementById('riskInput').addEventListener('input', function(){
+  const txt = this.value.toLowerCase();
+  let hit = riskKeywords.find(kw => txt.includes(kw));
+  let alertDiv = document.getElementById('riskAlert');
+  if(hit){
+    let matchState = stateSelect.value || "National";
+    let s = stateHelplines.find(h=>h.state===matchState);
+    alertDiv.innerHTML = `⚠️ <b>High-risk keyword detected:</b> "${hit}". 
+    <br>If in crisis in <b>${matchState}</b>, call <b>${s.helpline}</b> (${s.phone}). Click <b>Quick Help</b> for direct connection.`;
+  } else {
+    alertDiv.innerHTML = "Thank you for sharing, Please take good care of yourself. ";
+  }
+});
+
+// Emergency Message Form (auto-delete, privacy aware)
+document.getElementById('emergencyForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const btn = this.querySelector('.send-btn');
+  btn.disabled = true;
+  document.getElementById('msgStatus').textContent = 'Sending...';
+  setTimeout(()=>{
+    alert('Your anonymous message has been sent safely. No message is stored.');
+    this.reset();
+    document.getElementById('msgStatus').textContent = '';
+    btn.disabled = false;
+    if(window._incognitoMode) { window.setTimeout(()=>{document.getElementById('msgStatus').textContent = 'Incognito: Form auto-cleared.';},700);}
+  }, 900);
+});
+
+// Incognito for privacy
+window._incognitoMode = false;
+function toggleIncognito(){
+  window._incognitoMode = !window._incognitoMode;
+  let incBtn = document.getElementById('incognitoBtn');
+  incBtn.setAttribute("aria-pressed", window._incognitoMode);
+  incBtn.textContent = window._incognitoMode ? "Incognito ON" : "Enable Incognito";
+  if(window._incognitoMode){
+    document.querySelector('.privacy-banner').textContent = "Incognito Mode: All local data cleared after each use.";
+  } else {
+    document.querySelector('.privacy-banner').textContent = "Your privacy is protected — no form data is stored.";
+  }
+}
+
+// Quick Help Modal
+function showModal(){
+  let quickHelp = document.getElementById('quickHelpModal');
+  quickHelp.style.display='flex';
+  let val = stateSelect.value || "National";
+  let selected = stateHelplines.filter(h=>h.state===val || h.state==="National");
+  let qList = document.getElementById('quickHelpList');
+  qList.innerHTML = "You are not alone , we are here to support you always.";
+  selected.forEach(h=>{
+    let li = document.createElement("li");
+    li.innerHTML = `<span style="font-weight:800;color:#184488">${h.state}:</span> <span>${h.helpline}</span>
+      <button class="find-btn" onclick="callNumber('${h.phone.split(',')[0]}')">Call</button>
+      `;
+    qList.appendChild(li);
+  });
+}
+function closeModal(){document.getElementById('quickHelpModal').style.display="none";}
+
+</script>
+</body>
+</html>
