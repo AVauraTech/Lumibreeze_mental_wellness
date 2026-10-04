@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumi – Empathetic AI Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --grad-bg: linear-gradient(90deg, #fffde4 0%, #d0f4fb 100%);
+      --accent: #00bcd4;
+      --primary: #004d40;
+      --chat-bg: #f8fafc;
+      --user-bubble: #c1f7f8;
+      --bot-bubble: #fceabb;
+      --danger: #ed6c63;
+    }
+    body {
+      background: var(--grad-bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--primary);
+      min-height: 100vh;
+      display: flex; justify-content: center; align-items: flex-start;
+      margin: 0;
+    }
+    .container {
+      margin-top: 3.5rem;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 5px 32px rgba(71,226,220,0.14);
+      max-width: 430px;
+      width: 97vw;
+      padding: 0;
+      overflow: hidden;
+      animation: fadeIn .7s;
+    }
+    @keyframes fadeIn { 0%{opacity:0;transform:translateY(30px)} 100%{opacity:1;transform:none}}
+    .header {
+      background: linear-gradient(90deg,#e0f7fa 70%,#ffebee 130%);
+      text-align: center;
+      padding: 2.2rem 1rem 1rem 1rem;
+      border-bottom: 2px solid #cfd8dc;
+      position: relative;
+    }
+    .header h1 {
+      font-size: 2.1rem; color: #006064; margin-bottom: 0.15em;
+      letter-spacing: 0.04em; font-weight: 900;
+      text-shadow: 1px 1px 0 #fffdf3;
+    }
+    .header p {
+      color: #0097a7; font-size:1.08em; margin-bottom:.5em;
+    }
+    .animate-bot {
+      width: 78px; height: 78px; border-radius: 50%;
+      background: linear-gradient(135deg,#fceabb 43%,#e0f7fa 97%);
+      box-shadow: 0 2px 16px rgba(255,195,60,0.11);
+      position: absolute; left: 32px; top: 24px;
+      display: flex;align-items:center;justify-content:center;
+      animation: wobble 3.9s infinite alternate;
+    }
+    .animate-bot img { width: 61px; height: 61px;}
+    @keyframes wobble { 0%{transform:rotate(-3deg);} 100%{transform: rotate(9deg);}}
+
+    /* Floating Action Buttons */
+    .floating-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #18dcff 30%, #4834d4 85%);
+      box-shadow: 0 5px 28px #18dcffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 4px solid #00d2ffbb;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      z-index: 15050;
+      user-select: none;
+    }
+    .floating-btn:active {
+      transform: scale(0.9) rotate(-10deg);
+      box-shadow: 0 7px 30px #00d2ffdd;
+      outline: none;
+    }
+    .floating-btn:hover,
+    .floating-btn:focus-visible {
+      box-shadow: 0 12px 46px #18dcffee;
+      outline: none;
+    }
+    .floating-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+    }
+    .home {
+      top: 30px;
+      right: 30px;
+    }
+    
+    .lumipet {
+      top: 90px;
+      right: 30px;
+    }
+    /* Chat area */
+    .chat-area {
+      background: var(--chat-bg);
+      padding: 1.5em .8em;
+      min-height: 420px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      gap: 1.05em;
+      scroll-behavior: smooth;
+    }
+    .bubble {
+      max-width: 76%;
+      padding: .91em 1em;
+      border-radius: 16px 16px 16px 2px;
+      font-size: 1.03em;
+      box-shadow: 0 1px 5px rgba(71,226,220,0.06);
+      margin-bottom: 2px;
+      animation: popin .3s cubic-bezier(.5,2.5,.3,1);
+      line-height:1.45em;
+      word-break: break-word;
+      position: relative;
+    }
+    .bot { background: var(--bot-bubble); align-self: flex-start;  }
+    .user { background: var(--user-bubble); align-self: flex-end;border-bottom-left-radius: 16px; border-bottom-right-radius: 2px;}
+    .bubble img.exercise {height:24px;margin-bottom:-6px;margin-left:.23em;}
+    .bubble.helpline {
+      border: 2px solid var(--danger);
+      background: #fff5f3;
+      color: #da1347; font-weight:600;
+      font-size:.96em; margin: 8px 0;
+      display: flex; align-items: center;
+    }
+    @keyframes popin {0%{transform: scale(.65);}100%{transform:scale(1);}}
+    /* Input */
+    .chat-input-area {
+      display: flex; align-items: center;
+      border-top:1.5px solid #e0e0e0;
+      background:var(--chat-bg);
+      padding: 1.1em 1em;
+    }
+    .chat-input {
+      flex: 1;
+      border-radius: 16px;
+      border: 1px solid #c1f7f8;
+      font-size:1em;
+      padding: .75em 1em;
+      outline: none;
+      margin-right: .6em;
+      transition: border .18s;
+      background: #f8fafb;
+    }
+    .chat-input:focus { border: 1.7px solid var(--accent);}
+    .send-btn {
+      font-size: 1.7em;
+      background: linear-gradient(135deg,#e0f7fa 67%,#fffde4 90%);
+      color: #00acc1;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      padding: .16em .36em;
+      transition: background .16s;
+    }
+    .send-btn:hover { background: #fceabb; color:#d35400;}
+    /* Suggested actions */
+    .chip-row { margin-top:.2em; margin-bottom:.7em; }
+    .chip {
+      display: inline-block;
+      padding: .51em 1.12em;
+      margin-right:.54em;
+      background: linear-gradient(120deg,#f8fafc 80%,#f4f6f8 100%);
+      color: #0097a7; border-radius: 13px;
+      border:1.2px solid #00bcd425;
+      font-size:.99em; cursor:pointer;
+      box-shadow: 0 1px 2px rgba(71,226,220,0.045);
+      transition: background .16s,color .16s;
+    }
+    .chip:hover { background:var(--user-bubble);}
+    /* Emotions bar */
+    .mood-bar {
+      display:flex; justify-content:center;gap:1.2em; margin-bottom:.7em;
+    }
+    .mood-bar span {
+      font-size:1.85em; cursor:pointer; transition:transform .19s;
+    }
+    .mood-bar span.selected { transform:scale(1.25); }
+    /* Responsive */
+    @media (max-width:540px){
+      .container { margin-top:1.5rem;}
+      .header {padding: 1.9em .3em .7em .7em;}
+      .chat-area { min-height: 300px; max-height: 270px;}
+    }
+      footer {
+      background: #2d3436;
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="animate-bot"><img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="LumiBot"></div>
+    <br><br>
+    <h1>Lumi – AI Chatbot</h1>
+    <p>Your empathetic, private, mental wellness companion</p>
+  </div>
+    <!-- Floating LumiPet and Chatbot Buttons -->
+  <button class="floating-btn home" id="home" aria-label="Floating Home button" onclick="location.href='home.html'">
+    <img src="image/logo.jpg" alt="logo" />
+  </button>
+
+  <button class="floating-btn lumipet" id="lumipet" aria-label="Floating LumiPet virtual companion" onclick="location.href='pet.html'">
+    <img src="https://cdn-icons-png.flaticon.com/256/10872/10872585.png" alt="LumiPet companion icon" />
+  </button>
+
+
+  <div class="chat-area" id="chatArea"></div>
+  <div class="chip-row" id="chipRow"> 
+    <span class="chip" onclick="suggest('I want a distraction')">🎮 Distraction</span>
+    <span class="chip" onclick="suggest('Can you suggest an exercise?')">🧘Exercise</span>
+    <span class="chip" onclick="suggest('What do you remember about me?')">💭Memory</span>
+  </div>
+  <div class="mood-bar" id="moodBar">
+    <span onclick="suggest('I feel very low')" title="Very Low">😞</span>
+    <span onclick="suggest('I feel okay')">😐</span>
+    <span onclick="suggest('I feel anxious')">😟</span>
+    <span onclick="suggest('I feel sad')">😢</span>
+    <span onclick="suggest('I feel stress relief needed')">😣</span>
+    <span onclick="suggest('I feel happy today!')">😊 </span>
+    <span onclick="suggest('I feel motivated')">😃</span>
+  </div>
+  <div class="chat-input-area">
+    <input class="chat-input" id="chatInput" autocomplete="off" placeholder="Type how you feel or ask Lumi…" />
+    <button class="send-btn" onclick="sendMsg()"><i class="fa fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script type="module">
+  import { getState, ready as storeReady } from './js/core/store.js';
+  import * as memory from './js/core/vectors.js';
+  import { ambience } from './js/core/audio.js';
+
+  const chatArea = document.getElementById('chatArea');
+  let convoState = null; // track conversation context
+  let memoryCount = 0;
+  let lastSaved = '';
+  let calmStop = null;
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const clip = (s, n) => s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s;
+
+  function addMsg(msg, sender='bot', img='', isHTML=false) {
+    const bubble = document.createElement('div');
+    bubble.className = `bubble ${sender}`;
+    if(isHTML) bubble.innerHTML = msg;
+    else bubble.textContent = msg;
+    chatArea.appendChild(bubble);
+    if(img) {
+      const icon = document.createElement('img');
+      icon.src = img; icon.className = "exercise";
+      bubble.appendChild(icon);
+    }
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function toggleCalm() {
+    if (calmStop) { calmStop(); calmStop = null; addMsg('Ambience faded out 🤫'); }
+    else { calmStop = ambience('underwater'); addMsg('🎶 Soft ambient pad playing — press the button in my message again to stop.'); }
+  }
+  window.toggleCalm = toggleCalm;
+
+  // Index journal + mood history recorded elsewhere in the app, so Lumi can recall it here.
+  storeReady.then(() => memory.syncFromStore(getState().journal, getState().mood.history))
+    .then(() => memory.count())
+    .then(n => { memoryCount = n; })
+    .catch(() => { /* IndexedDB unavailable: memory stays off, chat still works */ });
+
+  // Greeting
+  window.onload = () => {
+    setTimeout(() => {
+      addMsg('👋 Hi! I\'m Lumi, here to listen and help you feel better today.');
+      setTimeout(()=> addMsg('You can share your mood, get self-care tips, try quick exercises, or just chat with me.'), 1200);
+      setTimeout(()=> {
+        addMsg('How are you feeling?');
+        if (memoryCount > 0) {
+          setTimeout(()=> addMsg(`💭 I'm holding ${memoryCount} on-device memories of our past talks and your journal. Ask "what do you remember?" any time.`), 1500);
+        }
+      }, 2000);
+    }, 320);
+  };
+
+  function getBotResponse(text) {
+    text = text.toLowerCase();
+
+    // STATE HANDLING
+    if(convoState === "breathing") {
+      convoState = null;
+      if(text.includes("yes")) {
+        return {msg:"Great! 🧘 Let’s do a short breathing exercise: Inhale 4, hold 3, exhale 5.", extra:''};
+      } else {
+        return {msg:"No problem 💙 Maybe grounding could help instead: 5 things you see, 4 touch, 3 hear, 2 smell, 1 taste.", extra:''};
+      }
+    }
+
+    if(convoState === "music") {
+      convoState = null;
+      if(text.includes("yes")) {
+        return {msg:'Here’s a calming soundscape 🎶 <button class="chip" onclick="toggleCalm()">play / stop ambience</button><br><i>(synthesised live in your browser — no audio files, no network)</i>', extra:''};
+      } else {
+        return {msg:"No problem 💙 Maybe grounding could help instead: 5 things you see, 4 touch, 3 hear, 2 smell, 1 taste.", extra:''};
+      }
+    }
+
+    if(convoState === "positivity") {
+      convoState = null;
+      if(text.includes("yes")) {
+      return {msg:"Awesome! 🌟 Try this positivity challenge: Write down 3 small things that went well today.", extra:''};
+      } else {
+        return {msg:"No problem 💙 Maybe grounding could help instead: 5 things you see, 4 touch, 3 hear, 2 smell, 1 taste.", extra:''};
+      }
+    }
+
+    if(convoState === "game") {
+      if(["rock","paper","scissors"].some(choice => text.includes(choice))) {
+        const botChoices = ["rock","paper","scissors"];
+        const botPick = botChoices[Math.floor(Math.random()*3)];
+        convoState = "game"; // continue game
+        return {msg:`I chose <b>${botPick}</b>! 🎮 Do you want to play again? (rock/paper/scissors)`, extra:''};
+      } else {
+        return {msg:"Type rock, paper, or scissors to play 🎲", extra:''};
+      }
+    }
+
+    // Distress keywords
+    const distress = ['help','suicide','hurt myself','no hope',"can't go on",'end it','kill myself','emergency','die','crisis','panic','very bad'];
+    for(const kw of distress) if(text.includes(kw)) {
+      return {
+        msg:'It sounds like you\'re going through a very tough time 💙 You matter. Please consider reaching out now:',
+        extra:`<div class="bubble helpline bot">Call <b>9152987821</b> – <a href="https://www.vandrevalafoundation.com/" target="_blank">Vandrevala Foundation</a> (24x7 helpline)</div>`,
+        critical: true
+      };
+    }
+
+    // Entry points
+    if(text.includes('anxious') || text.includes('anxiety')) {
+      convoState = "breathing";
+      return {msg:"I'm here with you 💙 Would a calming breathing exercise help right now? (yes/no)",extra:'<img src="https://cdn-icons-png.flaticon.com/256/10829/10829419.png" class="exercise">'};
+    }
+    if(text.includes('sad')||text.includes('depressed')||text.includes('low')) {
+      convoState = "music";
+      return {msg:"It’s okay to feel down 🌧. Want me to suggest a calming playlist? (yes/no)",extra:'<img src="https://cdn-icons-png.flaticon.com/256/7603/7603360.png" class="exercise" title="Music note">'};
+    }
+    if(text.includes('happy')||text.includes('joy')||text.includes('good')) {
+      convoState = "positivity";
+      return {msg:"Great to hear you feel good! 🌞 Want to try a quick positivity challenge? (yes/no)",extra:'<img src="https://cdn-icons-png.flaticon.com/256/6381/6381582.png" class="exercise" title="Happy star">'};
+    }
+    if(text.includes('stress')||text.includes('overwhelmed')) {
+      convoState = "breathing";
+      return {msg:"sometimes life can be overwhelming 💼. Would you like me to guide you through a short mindful breathing exercise? (yes/no)",extra:'<img src="https://cdn-icons-png.flaticon.com/512/3940/3940403.png" class="exercise">'};
+    }
+    if(text.includes('exercise')) {
+      return {msg:'Try the "5-4-3-2-1 grounding" 🧘: Name 5 things you see, 4 touch, 3 hear, 2 smell, 1 taste.',extra:'<img src="https://cdn-icons-png.flaticon.com/256/5824/5824750.png" class="exercise" title="Yoga pose">'};
+    }
+    if(text.includes('distraction')) {
+      convoState = "game";
+      return {msg:"Let’s play a distraction game! Type 'rock', 'paper', or 'scissors' ",extra:'<img src="https://cdn-icons-png.flaticon.com/256/10097/10097473.png" class="exercise" title="Dice">'}
+    }
+    if(text.includes('journal')) {
+      return {msg:'Here’s a journaling prompt ✍️: What is one thing that brought you calm today? Anything you save in the journal is embedded into my on-device memory so I can recall it later.',extra:'<img src="https://cdn-icons-png.flaticon.com/256/9627/9627252.png" class="exercise" title="Diary">'}
+    }
+    if(text.includes('motivated')||text.includes('energized')) {
+      convoState = "positivity";
+      return {msg:'Awesome! 🚀 Want me to give you a mini-goal for today?(yes/no)',extra:'<img src="https://cdn-icons-png.flaticon.com/256/10776/10776322.png" class="exercise" title="girl">'}
+    }
+
+    // Word-boundary match so "this week" no longer counts as a greeting.
+    if(/\b(hi|hello|hey)\b/.test(text)) {
+      return {msg:"Hello!! How are you feeling today? 💙 ",extra:'<img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" class="exercise">'};
+    }
+
+    // Default fallback
+    return {msg:'Thanks for sharing 💬. Have an awesome day ahead sweetheart💙',extra:'<img src="https://cdn-icons-png.flaticon.com/256/7592/7592510.png" class="exercise" title="Finger heart">'};
+  }
+
+  // Store meaningful user turns as 'chat' memories so later sessions can recall them.
+  async function saveToMemory(text) {
+    const t = text.trim();
+    if (t.length < 12 || t === lastSaved) return;
+    if (/^(yes|no|ok|okay|rock|paper|scissors)\b/.test(t.toLowerCase()) && t.length < 20) return;
+    lastSaved = t;
+    try {
+      await memory.remember({ text: t, kind: 'chat' });
+      memoryCount++;
+    } catch { /* private browsing: memory is best-effort */ }
+  }
+
+  async function handleInput(text) {
+    const lower = text.toLowerCase();
+
+    if (/forget (everything|all|my memories)|erase my memor|clear my memor/.test(lower)) {
+      try {
+        await memory.wipeMemory();
+        memoryCount = 0;
+        addMsg('Done — my on-device memory is empty again 🧹 Your journal and mood history in the app are untouched.');
+      } catch { addMsg('I couldn\'t clear memory right now (storage may be blocked).'); }
+      return;
+    }
+
+    if (/what do you remember|do you remember|recall|remember what i|last time i|anything about me/.test(lower)) {
+      let hits = [];
+      try { hits = await memory.recall(text, { k: 3, minScore: 0.12 }); } catch { /* storage blocked */ }
+      let recents = false;
+      if (!hits.length) {
+        try { hits = await memory.latest(3); recents = hits.length > 0; } catch { /* storage blocked */ }
+      }
+      if (hits.length) {
+        const lines = hits.map(h => `• "${esc(clip(h.entry.text, 90))}" <i>(${memory.relativeTime(h.entry.ts)}${recents ? '' : `, ${Math.round(h.score * 100)}% match`})</i>`).join('<br>');
+        addMsg((recents ? 'Here’s the most recent things I remember 💭:<br>' : 'Here’s what stands out from my on-device memory 💭:<br>') + lines, 'bot', '', true);
+      } else {
+        addMsg('I don’t have a memory that matches that yet 💭 Everything I learn is embedded and kept locally on this device — it never leaves your browser.');
+      }
+      return;
+    }
+
+    const resp = getBotResponse(text);
+    let msg = resp.msg;
+
+    // Weave in a relevant past memory (skip for crisis responses — the helpline must stay uncluttered).
+    if (!resp.critical) {
+      try {
+        const hits = await memory.recall(text, { k: 1, kinds: ['journal', 'chat'], minScore: 0.2 });
+        const hit = hits[0];
+        if (hit && Date.now() - hit.entry.ts > 5 * 60_000) {
+          msg += `<br><br>💭 <i>I remember you mentioned “${esc(clip(hit.entry.text, 70))}” ${memory.relativeTime(hit.entry.ts)} — how is that going now?</i>`;
+        }
+      } catch { /* storage blocked */ }
+    }
+
+    addMsg(msg, 'bot', '', true);
+    if (resp.extra) chatArea.innerHTML += resp.extra;
+    chatArea.scrollTop = chatArea.scrollHeight;
+    if (/happy|joy|good|motivated|smile|win/.test(lower)) showConfetti();
+    await saveToMemory(text);
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if(!text) return;
+    addMsg(text,'user');
+    input.value = '';
+    setTimeout(()=> handleInput(text), 400+Math.random()*170);
+  }
+  window.sendMsg = sendMsg;
+
+  function suggest(msg) {
+    document.getElementById('chatInput').value = msg;
+    sendMsg();
+    document.getElementById('chatInput').focus();
+  }
+  window.suggest = suggest;
+
+  function showConfetti() {
+    const conf = document.createElement('div');
+    conf.style.position = "fixed";
+    conf.style.left = "50vw"; conf.style.top = "30vh";
+    conf.style.transform = "translate(-50%,-50%)";
+    conf.style.fontSize = "2.7em";
+    conf.style.zIndex = 9999;
+    conf.textContent = "🎉✨";
+    document.body.appendChild(conf);
+    setTimeout(()=> conf.remove(),1200);
+  }
+
+  document.getElementById('chatInput').addEventListener('keydown', function(e){
+    if(e.key==='Enter') sendMsg();
+  });
+</script>
+</body>
+</html>
